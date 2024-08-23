@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autocomplete Example</title>
+  <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css" />
+</head>
+<body>
+  <div class="container mt-5 pt-5 col-md-5">
+    <h4>Search For Places</h4>
+  <div id="autocomplete" class="autocomplete">
+    <input class="autocomplete-input" />
+    <ul class="autocomplete-result-list"></ul>
+  </div>
+  </div>
+  <script src="https://unpkg.com/@trevoreyre/autocomplete-js"></script>
+  <script>
+    new Autocomplete('#autocomplete', {
+        search : input =>{
+            console.log(input)
+            const url = `/autocomplete/?city=${input}`
+            return new Promise(resolve => {
+                fetch(url)
+                .then(response => response.json())
+                .then(data => {resolve(data.data)})
+                
+            })
+        }
+    })
+  </script>
+</body>
+</html>

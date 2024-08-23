@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invite Collaborators</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Oswald:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+}
+
+.invite-popup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.invite-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: popIn 0.5s ease-out;
+    width: 300px;
+    position: relative;
+    transition: height 0.3s;
+}
+
+@keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+}
+
+.envelope {
+    width: 100px;
+    height: 100px;
+    background-color: #f1f1f1;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    position: relative;
+    animation: floatEnvelope 2s ease-in-out infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.envelope svg {
+    width: 50px;
+    height: 50px;
+}
+
+@keyframes floatEnvelope {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.email-input-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input[type="email"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+}
+
+button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #cccccc;
+}
+
+.no-thank-you {
+    margin-top: 50px;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%, 75% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+}
+
+.invite-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.success-message {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #0056b3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    margin: 10px auto; 
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.success-message svg {
+    width: 24px;
+    height: 24px;
+    stroke: #ffffff; 
+}
+
+.buttons {
+    display: none;
+    width: 100%;
+    margin-top: 20px;
+    justify-content: center;
+    gap: 10px;
+}
+
+.action_btn {
+    width: 50px;
+    margin: 0 auto;
+    display: inline;
+}
+
+.readymessage {
+    display: none;
+    margin-top: 10px;
+    font-size: 16px;
+    color: #007bff;
+    animation: fadeIn 0.5s;
+}
+
+.no-message {
+    display: none;
+    margin-top: 10px;
+    font-size: 16px;
+    color: #007bff;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="invite-popup" id="invitePopup">
+    <div class="invite-container" id="inviteContainer">
+        <div class="envelope">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12.713l-11.649-6.713 23.649 0-12 6.713zm-12-7.713v16h24v-16l-12 7-12-7z"/>
+            </svg>
+        </div>
+        <h2 class="invite-title montserrat-font">Invite Collaborators</h2>
+        <div class="email-input-container">
+            <input type="email" id="emailInput" placeholder="Enter email address">
+            <button id="addEmailButton">➤</button>
+        </div>
+        <div class="success-message" id="successMessage">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+        <div class="readymessage" id="readyMessage">Are you done adding emails?</div>
+        <a href="/budget/?trip_id={{ trip_id }}">
+            <button class="no-thank-you" id="noThankYouButton">Maybe Later</button>
+        </a>
+        <div class="buttons">
+            <button class="yes" id="yesButton">Yes</button>
+            <button class="no" id="noButton">No</button>
+        </div>
+        <div class="no-message" id="noMessage">Well then continue adding emails 😊</div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var invitePopup = document.getElementById('invitePopup');
+        var inviteContainer = document.getElementById('inviteContainer');
+        var emailInput = document.getElementById('emailInput');
+        var addEmailButton = document.getElementById('addEmailButton');
+        var noThankYouButton = document.getElementById('noThankYouButton');
+        var yesButton = document.getElementById('yesButton');
+        var noButton = document.getElementById('noButton');
+        var successMessage = document.getElementById('successMessage');
+        var readyMessage = document.getElementById('readyMessage');
+        var noMessage = document.getElementById('noMessage');
+        var buttonsContainer = document.querySelector('.buttons');
+        var addedEmails = [];
+    
+        invitePopup.style.display = 'flex';
+    
+        addEmailButton.addEventListener('click', function() {
+            var email = emailInput.value;
+            if (validateEmail(email)) {
+                if (!addedEmails.includes(email)) {
+                    addedEmails.push(email);
+                    localStorage.setItem('addedEmails', JSON.stringify(addedEmails));
+                    showSuccessMessage();
+                    emailInput.value = '';
+                    if (addedEmails.length > 0) {
+                        noThankYouButton.style.display = 'none';
+                        buttonsContainer.style.display = 'flex';
+                        readyMessage.style.display = 'block';
+                    }
+                } else {
+                    alert('Email already added!');
+                }
+            } else {
+                shakeContainer();
+            }
+        });
+    
+        noThankYouButton.addEventListener('click', function() {
+            invitePopup.style.display = 'none';
+        });
+    
+        yesButton.addEventListener('click', function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/email/{{ trip_id }}', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            var csrftoken = getCookie('csrftoken');
+            xhr.setRequestHeader('X-CSRFToken', csrftoken);
+            xhr.onload = function () {
+                if (xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    window.location.href = response.redirect_url;
+                } else {
+                    console.error('Error sending emails to the backend');
+                }
+            };
+            xhr.onerror = function () {
+                console.error('Error sending emails to the backend');
+            };
+            xhr.send(JSON.stringify(addedEmails));
+        });
+    
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        noButton.addEventListener('click', function() {
+            noMessage.style.display = 'block';
+        });
+    
+        function validateEmail(email) {
+            var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    
+        function showSuccessMessage() {
+            successMessage.style.opacity = '1';
+            setTimeout(function() {
+                successMessage.style.opacity = '0';
+            }, 3000);
+        }
+    
+        function shakeContainer() {
+            inviteContainer.style.animation = 'popIn 0.5s ease-out';
+            inviteContainer.style.animation = 'shake 0.3s';
+            inviteContainer.addEventListener('animationend', function() {
+                inviteContainer.style.animation = '';
+            });
+        }
+    
+        function checkExistingEmails() {
+            if (addedEmails.length > 0) {
+                noThankYouButton.style.display = 'none';
+                buttonsContainer.style.display = 'flex';
+                readyMessage.style.display = 'block';
+            }
+        }
+    
+        checkExistingEmails();
+    });
+    </script>    
+</body>
+</html>

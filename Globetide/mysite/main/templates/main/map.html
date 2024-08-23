@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Map with Search Bar, Markers, and Street View</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px; 
+            width: 100%;  
+        }
+       .search-bar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            padding: 7px;
+            z-index: 1000;
+        }
+       .search-bar input[type="text"] {
+            border: none;
+            outline: none;
+            padding: 5px;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+       .search-bar button {
+            background-color: white;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+        }
+       .search-bar button:hover {
+            background-color: #f0f0f0;
+        }
+       .search-bar.magnifying-glass {
+            margin-right: 5px;
+        }
+       .google-form-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none;
+            z-index: 2000;
+        }
+       .google-form {
+            width: 300px;
+            height: 200px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+      .google-form input[type="text"] {
+            border: none;
+            outline: none;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+      .google-form button {
+            background-color: white;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-top: 10px;
+        }
+      .google-form button:hover {
+            background-color: #f0f0f0;
+        }
+      .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+      .close-button {
+            cursor: pointer;
+            font-size: 16px;
+            background-color: transparent; 
+            border: none;
+        }
+      .close-button img {
+            width: 24px;
+            height: 30px;
+        }
+      .close-button:hover {
+            background-color: transparent; 
+        }
+      .transport-icons {
+            display: flex;
+            align-items: center;
+        }
+      .transport-icons img {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px; 
+            cursor: pointer;
+            transition: border-color 0.3s, border-radius 0.3s;
+            vertical-align: middle;
+        }
+      .transport-icons img:last-child {
+            margin-right: 0;
+        }
+      .input-group {
+            margin-right: 70px;
+            margin-bottom: 20px; 
+        }
+       .pegman {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1000;
+            cursor: move;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-draggable@1.0.2/dist/leaflet.draggable.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-draggable@1.0.2/dist/leaflet.draggable.css" />
+    <script>
+        const latitude = parseFloat({{ lat }});
+        const longitude = parseFloat({{ long }});
+    
+        console.log('Latitude:', latitude);
+        console.log('Longitude:', longitude);
+        
+        var map = L.map('map').setView([latitude, longitude], 12);
+    
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    
+        var searchControl = L.Control.extend({
+            onAdd: function(map) {
+                var div = L.DomUtil.create('div', 'search-bar');
+                div.innerHTML = `
+                    <button class="magnifying-glass">
+                        <img src="https://img.icons8.com/ios-filled/16/000000/search.png" alt="Search">
+                    </button>
+                    <input type="text" placeholder="Enter a location..." id="search-input">
+                    <button class="go-arrow">
+                        <img src="https://img.icons8.com/ios-filled/16/000000/arrow.png" alt="Go">
+                    </button>
+                    <ul id="search-results"></ul>
+                `;
+    
+                var input = div.querySelector('input[type="text"]');
+                input.addEventListener('input', function() {
+                    var query = input.value;
+                    if (query.length > 2) {
+                        fetch(`https://api.stadiamaps.com/geocoding/v1/autocomplete?text=${query}`, {
+                            headers: {
+                                Authorization: ''
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            var resultsHtml = '';
+                            data.features.forEach(result => {
+                                resultsHtml += `<li>${result.properties.label}</li>`;
+                            });
+                            document.getElementById('search-results').innerHTML = resultsHtml;
+                        });
+                    }
+                });
+    
+                div.querySelector('.go-arrow').addEventListener('click', function() {
+                    var query = input.value.trim();
+                    if (query !== '') {
+                        fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&addressdetails=1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            var resultsHtml = '';
+                            data.forEach(result => {
+                                resultsHtml += `<p>${result.display_name} (${result.lat}, ${result.lon})</p>`;
+                            });
+                            document.getElementById('results').innerHTML = resultsHtml;
+    
+                            data.forEach(result => {
+                                var marker = L.marker([result.lat, result.lon]).addTo(map);
+                                marker.bindPopup(result.display_name);
+                            });
+                        })
+                        .catch(error => console.error(error));
+                    }
+                });
+    
+                return div;
+            },
+            onRemove: function(map) {
+                // Perform any cleanup here if necessary
+            }
+        });
+    
+        var googleFormControl = L.Control.extend({
+            onAdd: function(map) {
+                var div = L.DomUtil.create('div', 'google-form');
+                div.innerHTML = `
+                    <div class="header">
+                        <div class="transport-icons">
+                            <img src="https://img.icons8.com/ios-filled/32/000000/walking.png" alt="Walk">
+                            <img src="https://img.icons8.com/ios-filled/32/000000/driving.png" alt="Drive">
+                            <img src="https://img.icons8.com/?size=100&id=59723&format=png&color=000000" alt="Plane">                    
+                            <img src="https://img.icons8.com/ios-filled/32/000000/cycling-road.png" alt="Bicycle">
+                            <img src="https://img.icons8.com/ios-filled/32/000000/train.png" alt="Train">
+                        </div>
+                        <button class="close-button">
+                            <img src="https://img.icons8.com/ios/24/000000/x.png" alt="Close">
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" placeholder="Enter Starting Point" class="start-input" style="border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                    </div>
+                    <div class="input-group">
+                        <input type="text" placeholder="Enter Ending Point" class="end-input" style="border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                    </div>
+                `;
+    
+                div.querySelector('.close-button').addEventListener('click', function() {
+                    map.removeControl(googleFormControlInstance);
+                    searchControlInstance = new searchControl();
+                    map.addControl(searchControlInstance);
+                });
+    
+                var transportIcons = div.querySelectorAll('.transport-icons img');
+                transportIcons.forEach(icon => {
+                    icon.addEventListener('click', function() {
+                        transportIcons.forEach(i => i.classList.remove('selected'));
+                        icon.classList.add('selected');
+                    });
+                });
+    
+                return div;
+            },
+            onRemove: function(map) {
+                // Perform any cleanup here if necessary
+            }
+        });
+    
+        var searchControlInstance;
+        var googleFormControlInstance;
+    
+        function init() {
+            searchControlInstance = new searchControl({ position: 'topright' });
+            googleFormControlInstance = null;
+            map.addControl(searchControlInstance);
+        }
+    
+        init();
+    
+        var markers = [];
+        var lines = [];
+    
+        map.on('dblclick', function(e) {
+            var marker = L.marker(e.latlng, {
+                draggable: true
+            }).addTo(map);
+            marker.bindTooltip(`
+                <div>
+                    Latitude: ${e.latlng.lat.toFixed(6)}
+                    <br>
+                    Longitude: ${e.latlng.lng.toFixed(6)}
+                </div>
+            `, { permanent: false, direction: 'top' });
+    
+            marker.on('click', function() {
+                map.removeLayer(marker);
+                markers = markers.filter(m => m !== marker);
+                lines.forEach(line => {
+                    if (line.getLatLngs().some(latlng => markers.every(m => m.getLatLng() !== latlng))) {
+                        map.removeLayer(line);
+                    }
+                });
+                lines = lines.filter(l => !l.getLatLngs().some(latlng => markers.every(m => m.getLatLng() !== latlng)));
+                updateLines();
+            });
+    
+            marker.on('dragend', function() {
+                updateLines();
+            });
+    
+            markers.push(marker);
+            updateLines();
+        });
+    
+        function updateLines() {
+            lines.forEach(line => map.removeLayer(line));
+            lines = [];
+            for (var i = 0; i < markers.length - 1; i++) {
+                var marker1 = markers[i];
+                var marker2 = markers[i + 1];
+                var start = `${marker1.getLatLng().lng},${marker1.getLatLng().lat}`;
+                var end = `${marker2.getLatLng().lng},${marker2.getLatLng().lat}`;
+                fetch(`https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf62481260b21b377b41c99cb51291b4a2f1aa&start=${start}&end=${end}&profile=driving-traffic`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API response:', data);
+                    if (data.features && data.features.length > 0) {
+                        var feature = data.features[0];
+                        var routeGeometry = feature.geometry.coordinates;
+                        var lineCoords = routeGeometry.map(coord => [coord[1], coord[0]]);
+                        console.log('Line coords:', lineCoords);
+                        var totalDistance = 0;
+                        var totalDuration = 0;
+                        for (var j = 0; j < lineCoords.length - 1; j++) {
+                            var latlng1 = L.latLng(lineCoords[j]);
+                            var latlng2 = L.latLng(lineCoords[j + 1]);
+                            totalDistance += getDistance(latlng1, latlng2);
+                        }
+                        totalDuration = feature.properties.summary.duration / 60;
+                        var line = L.polyline(lineCoords, {
+                            color: 'blue',
+                            weight: 3,
+                            opacity: 0.5
+                        }).addTo(map);
+                        line.bindTooltip(`Distance: ${totalDistance.toFixed(2)} km, ETA: ${totalDuration.toFixed(2)} minutes`, { permanent: true, direction: 'top' });
+                        lines.push(line);
+                    } else {
+                        console.error('No route found');
+                    }
+                })
+                .catch(error => {
+                    console.error('API error:', error);
+                });
+            }
+        }
+    
+        function getDistance(latlng1, latlng2) {
+            var R = 6371;
+            var dLat = (latlng2.lat - latlng1.lat) * Math.PI / 180;
+            var dLon = (latlng2.lng - latlng1.lng) * Math.PI / 180;
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(latlng1.lat * Math.PI / 180) * Math.cos(latlng2.lat * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c;
+            return d;
+        }
+    
+        map.on('mouseover', function(e) {
+            if (e.target instanceof L.Marker) {
+                var marker = e.target;
+                marker.openTooltip();
+            }
+        });
+    
+        map.on('mouseout', function(e) {
+            if (e.target instanceof L.Marker) {
+                e.target.closeTooltip();
+            }
+        });
+    </script>
+</body>
+</html>

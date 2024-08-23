@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins&display=swap">
+    <link rel="stylesheet" href="https://kit-free.fontawesome.com/releases/latest/css/free.min.css" media="all">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *:before,
+        *:after {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #CBD3F4;
+            height: 100vh;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+        .stars, .moons, .rockets, .planets {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+        .stars i, .moons i, .rockets i, .planets i {
+            position: absolute;
+            color: white;
+        }
+        .stars i {
+            font-size: 4px;
+        }
+        .moons i, .rockets i, .planets i {
+            font-size: 30px;
+            animation-duration: 5s;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+        }
+        .moons i {
+            color: #f1c40f;
+            animation-name: moonAnimation;
+        }
+        .rockets i {
+            color: #e74c3c;
+            animation-name: rocketAnimation;
+        }
+        @keyframes moonAnimation {
+            0%, 100% {
+                transform: translateY(-10px);
+            }
+            50% {
+                transform: translateY(10px);
+            }
+        }
+        @keyframes rocketAnimation {
+            0%, 100% {
+                transform: translateY(-20px);
+            }
+            50% {
+                transform: translateY(20px);
+            }
+        }
+        .planets i {
+            font-size: 50px;
+            color: #3498db;
+            animation-name: planetAnimation;
+            animation-duration: 10s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        @keyframes planetAnimation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        form {
+            width: 450px;
+            background-color: rgb(255, 255, 255);
+            z-index: 1000;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+            padding: 50px 35px;
+            transition: height 0.3s ease;
+        }
+        form.extended {
+            height: 700px;
+        }
+        form * {
+            font-family: 'Poppins', sans-serif;
+            color: #000000;
+            letter-spacing: 0.5px;
+            outline: none;
+            border: none;
+        }
+        form h3 {
+            font-size: 32px;
+            font-weight: 500;
+            line-height: 42px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 30px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        input {
+            display: block;
+            height: 40px;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.07);
+            border-radius: 3px;
+            padding: 0 10px;
+            margin-top: 2px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        ::placeholder {
+            color: #000000;
+        }
+        button {
+            margin-top: 14px;
+            width: 100%;
+            background-color: #000000;
+            color: #ffffff;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .social {
+            margin-top: 30px;
+            display: flex;
+        }
+        .social div {
+            width: 150px;
+            border-radius: 3px;
+            padding: 5px 10px 10px 5px;
+            background-color: rgba(255, 255, 255, 0.27);
+            color: #eaf0fb;
+            text-align: center;
+        }
+        .social div:hover {
+            background-color: rgba(0, 0, 0, 0.47);
+        }
+        .social .fb {
+            margin-left: 25px;
+        }
+        .social i {
+            margin-right: 4px;
+        }
+
+        .centered {
+            text-align: center;
+        }
+
+        a {
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .dob-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dob-inputs input {
+            flex: 1; 
+        }
+
+        .country-inputs{
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-inputs input {
+            flex: 1; 
+        }
+        
+        #add-info {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="" method="post" onsubmit="return validateForm()" style="position: absolute;" class="submit-form" id="profile-info">
+            {% csrf_token %} 
+            <h3>User Registration</h3>
+
+            <label for="username">Username</label>
+            <input type="text" placeholder="Username" name="username" id="username">
+
+            <label for="email">Email</label>
+            <input type="email" placeholder="Email" name="email" id="email">
+
+            <label for="password1">Password</label>
+            <input type="password" placeholder="Password" id="password1" name="password1">
+
+            <label for="password2">Confirm Password</label>
+            <input type="password" placeholder="Confirm Password" id="password2" name="password2">
+
+            <button type="button" id="register-button" onclick="switchForms()">Register</button>
+
+            <div class="centered">
+                <a href="login/" >I already have an account</a>
+            </div>
+
+            <div id="error-message" class="error-message"></div>
+        </form>
+        <form action="" method="post" onsubmit="return validateForm()" style="position: absolute;" class="submit-form" id="add-info">
+            <h3>Let's Get to Know You.</h3>
+            {% csrf_token %}
+            <label for="FirstName">First Name</label>
+            <input type="text" placeholder="Enter First Name" id="FirstName" name="FirstName" onkeydown="return alphaOnly(event)" required>
+        
+            <label for="LastName">Last Name</label>
+            <input type="text" placeholder="Enter Last Name" id="LastName" name="LastName" onkeydown="return alphaOnly(event)" required>
+            
+            <label for="dob">Date of Birth</label>
+            <div class="dob-inputs">
+                <input type="number" placeholder="MM" id="dob-month" name="dob-month" min="1" max="12" required>
+                <input type="number" placeholder="DD" id="dob-day" name="dob-day" min="1" max="31" required>
+                <input type="number" placeholder="YYYY" id="dob-year" name="dob-year" min="1900" max="2100" required>
+            </div>
+        
+            <label for="PhoneNumber">Phone Number</label>
+            <input type="number" id="PhoneNumber" name="PhoneNumber" pattern="[0-9]+" title="Phone number should contain numbers only" required>
+        
+            <label for="Country">Place of Origin</label>
+            <div class="country-inputs">
+                <input type="text" placeholder="Enter Country" id="Country" name="Country" onkeydown="return alphaOnly(event)" required>
+                <input type="text" placeholder="Enter City" id="City" name="City" onkeydown="return alphaOnly(event)" required>
+            </div>
+            
+            <div id="recaptcha-container" style="display: none; margin-top: 20px; justify-content: center;">
+                <div class="g-recaptcha" data-sitekey="6LeJPu0pAAAAAOqT2Eh66Vs6P_ys-GLWut1o-_wI"></div>
+            </div>
+
+            <button type="button" onclick="handleRegisterClick()">Submit</button>
+        </form>
+        <div class="stars">
+            <i class="fas fa-star" style="top: 10%; left: 20%;"></i>
+            <i class="fas fa-star" style="top: 30%; left: 60%;"></i>
+            <i class="fas fa-star" style="top: 50%; left: 80%;"></i>
+            <i class="fas fa-star" style="top: 70%; left: 40%;"></i>
+            <i class="fas fa-star" style="top: 90%; left: 10%;"></i>
+            <i class="fas fa-star" style="top: 15%; left: 35%;"></i>
+            <i class="fas fa-star" style="top: 45%; left: 75%;"></i>
+            <i class="fas fa-star" style="top: 65%; left: 25%;"></i>
+            <i class="fas fa-star" style="top: 85%; left: 55%;"></i>
+            <i class="fas fa-star" style="top: 25%; left: 90%;"></i>
+        </div>
+        <div class="moons">
+            <i class="fas fa-moon" style="top: 20%; left: 30%;"></i>
+            <i class="fas fa-moon" style="top: 70%; left: 70%;"></i>
+            <i class="fas fa-moon" style="top: 50%; left: 50%;"></i>
+            <i class="fas fa-moon" style="top: 40%; left: 20%;"></i>
+            <i class="fas fa-moon" style="top: 80%; left: 80%;"></i>
+        </div>
+        <div class="rockets">
+            <i class="fas fa-rocket" style="top: 40%; left: 50%;"></i>
+            <i class="fas fa-rocket" style="top: 80%; left: 20%;"></i>
+            <i class="fas fa-rocket" style="top: 60%; left: 80%;"></i>
+            <i class="fas fa-rocket" style="top: 20%; left: 40%;"></i>
+            <i class="fas fa-rocket" style="top: 70%; left: 60%;"></i>
+        </div>
+        <div class="planets">
+            <i class="fas fa-globe" style="top: 10%; left: 80%;"></i>
+            <i class="fas fa-globe" style="top: 50%; left: 30%;"></i>
+            <i class="fas fa-globe" style="top: 30%; left: 10%;"></i>
+            <i class="fas fa-globe" style="top: 70%; left: 90%;"></i>
+            <i class="fas fa-globe" style="top: 90%; left: 50%;"></i>
+        </div>
+    </div>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+        let registerClicked = false;
+
+        function handleRegisterClick() {
+            if (!registerClicked) {
+                document.getElementById('recaptcha-container').style.display = 'block';
+                registerClicked = true;
+            } else {
+                if (grecaptcha.getResponse() === "") {
+                    displayErrorMessage("Please complete the reCAPTCHA");
+                    return false;
+                } else {
+                    if (validateForm()) {
+                        // Create a new form element
+                        var combinedForm = document.createElement('form');
+                        combinedForm.method = 'post';
+                        combinedForm.action = ''; // Specify your action here
+
+                        // Append CSRF token
+                        var csrfToken = document.createElement('input');
+                        csrfToken.type = 'hidden';
+                        csrfToken.name = 'csrfmiddlewaretoken';
+                        csrfToken.value = '{{ csrf_token }}'; // Django template tag, change according to your backend
+                        combinedForm.appendChild(csrfToken);
+
+                        // Collect data from the first form
+                        var form1 = document.getElementById('profile-info');
+                        var form1Elements = form1.elements;
+                        for (var i = 0; i < form1Elements.length; i++) {
+                            if (form1Elements[i].name && form1Elements[i].value) {
+                                var input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = form1Elements[i].name;
+                                input.value = form1Elements[i].value;
+                                combinedForm.appendChild(input);
+                            }
+                        }
+
+                        // Collect data from the second form
+                        var form2 = document.getElementById('add-info');
+                        var form2Elements = form2.elements;
+                        for (var i = 0; i < form2Elements.length; i++) {
+                            if (form2Elements[i].name && form2Elements[i].value) {
+                                var input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = form2Elements[i].name;
+                                input.value = form2Elements[i].value;
+                                combinedForm.appendChild(input);
+                            }
+                        }
+
+                        // Append the combined form to the body and submit
+                        document.body.appendChild(combinedForm);
+                        combinedForm.submit();
+                    }
+                }
+            }
+        }
+        function switchForms() {
+            if (validateForm()) {
+                document.getElementById('add-info').style.display = 'initial';
+            }
+        }
+        function validateForm() {
+            var username = document.getElementById("username").value;
+            var email = document.getElementById("email").value;
+            var password1 = document.getElementById("password1").value;
+            var password2 = document.getElementById("password2").value;
+            var form = document.getElementById("profile-info");
+
+            clearErrorMessages();
+            
+            if (username.trim() === "") {
+                displayErrorMessage("Username cannot be empty");
+                return false;
+            }
+
+            if (!isValidEmail(email)) {
+                displayErrorMessage("Please enter a valid email address");
+                return false;
+            }
+            
+            if (password1.trim() === "" || password2.trim() === "") {
+                displayErrorMessage("Passwords cannot be empty");
+                return false;
+            }
+            if (password1 !== password2) {
+                displayErrorMessage("Your passwords did not match, please try again");
+                return false;
+            }
+            if (!isStrongPassword(password1)) {
+                displayErrorMessage("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character");
+                form.classList.add("extended");
+                return false;
+            }
+
+            form.classList.remove("extended");
+            return true;
+        }
+
+        function isValidEmail(email) {
+            var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isStrongPassword(password) {
+            var strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+            return strongPasswordRegex.test(password);
+        }
+
+        function displayErrorMessage(message) {
+            var errorMessage = document.getElementById("error-message");
+            errorMessage.innerText = message;
+        }
+
+        function clearErrorMessages() {
+            document.getElementById("error-message").innerText = "";
+        }
+
+        function alphaOnly(event) {
+            var key = event.keyCode;
+            return ((key >= 65 && key <= 90) || key == 8 || key == 32); 
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
+    <script>
+        var input = document.querySelector("#PhoneNumber");
+        var iti = window.intlTelInput(input, {
+            initialCountry: "auto",
+            separateDialCode: true,
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        });
+
+        input.addEventListener('countrychange', function () {
+            var selectedCountryData = iti.getSelectedCountryData();
+            var maxLength = selectedCountryData.dialCode.length + selectedCountryData.format.split('-').join('').length;
+            input.setAttribute('maxlength', maxLength);
+        });
+    </script>
+</body>
+</html>

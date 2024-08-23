@@ -1,0 +1,737 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+{% load static %}
+<style>
+    :root {
+      --bg-main: #000000; 
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .all {
+        top: 1vw;
+        position: relative;
+        border-collapse: separate;
+        border-spacing: 4vw;
+        width: 60vw;
+        height: 60vw;
+    }
+
+    .section {
+        width: 26vw;
+        max-width: 26vw;
+        min-width: 26vw;
+        height: 24vw;
+        max-height: 24vw;
+        min-height: 24vw;
+    }
+
+    .trip {
+        border-spacing: 1vw 2vw;
+        border-collapse: separate;
+        width: max-content;
+        height: 24vw;
+        max-height: 24vw;
+        min-height: 24vw;
+        position: relative;
+    }
+
+    .trip td {
+        border: 1px solid black;
+        padding: 20px;
+        position: relative;
+        height: 10vw;
+        width: 10vw;
+        border-radius: 20px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .trip-text {
+        position: absolute;
+        bottom: -1.5vw;
+        text-wrap: nowrap;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        padding: 0 5px;
+    }
+
+    .selector {
+        font-size: 24px;
+        border: 1px solid black;
+        background-color: white;
+        width: 1.3vw;
+        height: 1.4vw;
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        vertical-align: middle;
+        text-align: center; 
+        display: inline-block;
+    }
+
+    .selector:hover {
+        cursor: pointer;
+    }
+
+    .calendar {
+        height: 100%;
+        width: 100%;
+        background-color: var(--bg-main);
+        padding: 20px;
+        position: relative; 
+        overflow: hidden;
+        transform: translateY(-50%); 
+        overflow: hidden;
+        transform: scale(1);
+        z-index: 100; 
+    }
+
+    .light .calendar {
+        box-shadow: var(--shadow);
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 25px;
+        font-weight: 600;
+        color: white;
+        padding: 10px;
+    }
+    
+    .calendar-body {
+        padding: 10px;
+    }
+
+    .calendar-week-day {
+        height: 50px;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        font-weight: 600;
+    }
+
+    .calendar-week-day div {
+        display: grid;
+        place-items: center;
+        color: white;
+    }
+
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        color: white;
+    }
+
+    .calendar-days div {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+        position: relative;
+        cursor: pointer;
+        animation: to-top 1s forwards;
+        /* border-radius: 50%; */
+    }
+
+    .calendar-days div span {
+        position: absolute;
+    }
+
+    .calendar-days div:hover span {
+        transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+    }
+
+    .calendar-days div span:nth-child(1),
+    .calendar-days div span:nth-child(3) {
+        width: 2px;
+        height: 0;
+        background-color: white;
+    }
+
+    .calendar-days div:hover span:nth-child(1),
+    .calendar-days div:hover span:nth-child(3) {
+        height: 100%;
+    }
+
+    .calendar-days div span:nth-child(1) {
+        bottom: 0;
+        left: 0;
+    }
+
+    .calendar-days div span:nth-child(3) {
+        top: 0;
+        right: 0;
+    }
+
+    .calendar-days div span:nth-child(2),
+    .calendar-days div span:nth-child(4) {
+        width: 0;
+        height: 2px;
+        background-color: white;
+    }
+
+    .calendar-days div:hover span:nth-child(2),
+    .calendar-days div:hover span:nth-child(4) {
+        width: 100%;
+    }
+
+    .calendar-days div span:nth-child(2) {
+        top: 0;
+        left: 0;
+    }
+
+    .calendar-days div span:nth-child(4) {
+        bottom: 0;
+        right: 0;
+    }
+
+    .calendar-days div:hover span:nth-child(2) {
+        transition-delay: 0.2s;
+    }
+
+    .calendar-days div:hover span:nth-child(3) {
+        transition-delay: 0.4s;
+    }
+
+    .calendar-days div:hover span:nth-child(4) {
+        transition-delay: 0.6s;
+    }
+
+    .calendar-days div.curr-date, .calendar-days div.curr-date:hover {
+        background-color: rgb(255, 255, 255);
+        color: rgb(0, 0, 0);
+        border-radius: 50%;
+    }
+
+    .calendar-days div.curr-date span {
+        display: none;
+    }
+
+    .month-picker {
+        padding: 5px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .month-picker:hover {
+        background-color: grey;
+    }
+
+    .year-picker {
+        display: flex;
+        align-items: center;
+    }
+
+    .year-change {
+        height: 30px;
+        width: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        margin: 0 10px;
+        cursor: pointer;
+    }
+
+    .year-change:hover {
+        background-color: var(--color-hover);
+    }
+
+    .glyphicon {
+        font-size: 15px;
+        color: white;
+    }
+
+    .calendar-footer {
+        padding: 10px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .toggle {
+        display: flex;
+    }
+
+    .toggle span {
+        margin-right: 10px;
+        color: var(--color-txt);
+    }
+
+    .month-list {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: var(--bg-main);
+        padding: 20px;
+        text-align: center;
+        align-items: center;
+        transform: scale(1.5);
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .month-list > div {
+        display: inline-block;
+        width: 30%; 
+        margin: 5px;
+    }
+
+    .month-list.show {
+        transform: scale(1);
+        visibility: visible;
+        pointer-events: visible;
+        transition: all 0.2s ease-in-out;
+        
+    }
+
+    .month-list > div > div {
+        width: 100%;
+        padding: 5px 20px;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        color: white;
+    }
+
+    .month-list > div > div:hover {
+        background-color: grey;
+    }
+
+    @keyframes to-top {
+        0% {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .overview-info {
+        border-spacing: 1vw 2vw;
+        border-collapse: separate;
+        width: 100%;
+        height: 100%;
+    }
+
+    .overview-info td {
+        padding: 10px 20px;
+        vertical-align: top;
+        position: relative;
+        border: 1px solid black;
+        border-radius: 20px;
+        width: 100%;
+        height: 50%;
+    }
+
+    .calendar-days div.selected-date {
+        position: relative;
+        }
+
+    .calendar-days div.selected-date::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 2px solid white;
+        border-radius: 50%;
+    }
+
+    .create-trip-btn {
+        background-color: #CBD3F4;
+        color: #333;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        position: absolute;
+        top: 15%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 6.5vw;
+        height: 4.5vh;
+        transition: left 0.5s;
+        z-index: 101;
+    }
+
+   .create-trip-btn:hover {
+        background-color: #B8C6E3;
+    }
+
+   .create-trip-btn.clicked {
+        left: 75.5%;
+    }
+
+   .fields {
+        position: absolute;
+        top: 15%;
+        left: 50%;
+        transform: translate(-56.5%, -50%);
+        z-index: 101;
+        display: none;
+    }
+
+   .fields input[type="text"],
+   .fields input[type="date"] {
+        margin-right: 3.1vw;
+        padding: 10px;
+        font-size: 18px;
+        width: 13vw;
+        background-color: #CBD3F4;
+        border: none;
+        color: #333;
+    }
+
+   .fields input[type="date"] {
+        box-sizing: border-box;
+        padding-right: 20px;
+    }
+
+   .fields input:hover {
+        background-color: #B8C6E3;
+    }
+
+    .create-trip-btn.clicked + .fields {
+        display: block;
+    }
+</style>
+
+<body>
+    <button class="create-trip-btn">Create Trip</button>
+    <div class="fields" style="display: none;">
+        <form id="trip-form">
+            <input type="text" id="location" name="location" placeholder="Location" required>
+            <input type="date" id="start-date" name="start-date" placeholder="Start Date" required>
+            <input type="date" id="end-date" name="end-date" placeholder="End Date" required>
+            <button type="submit">Submit Trip</button>
+        </form>
+    </div>
+    <center>
+        <table class="all">
+            <tr>
+                <td class="section" style="overflow-x: scroll; border: none;">
+                    <table class="trip">
+                        <tr id="top-row"> <!-- This needs a loop within the tr tag, surrounding the td tag that loops over the "top row trips" as mentioned in the view -->
+                            {% for trip in trt %}
+                            <td data-trip-id="{{ trip.id }}" style="background-image: url('https://asset-prod.france.fr/CER_1_Paris2024_Look_of_the_Games_La_Seine_Olympique_16_9_Sans_Mention_1_1_a3aadbc53d.jpg');">
+                                <div class="selector"></div>
+                                <div class="trip-text">{{ trip.destination }}</div>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        <tr id="bottom-row"> <!-- This needs a loop within the tr tag, surrounding the td tag that loops over the "bottom row trips" as mentioned in the view -->
+                            {% for trip in brt %}
+                            <td data-trip-id="{{ trip.id }}" style="background-image: url('https://asset-prod.france.fr/CER_1_Paris2024_Look_of_the_Games_La_Seine_Olympique_16_9_Sans_Mention_1_1_a3aadbc53d.jpg');">
+                                <div class="selector"></div>
+                                <div class="trip-text">{{ trip.destination }}</div>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                </td>
+                <td class="section">
+                    <center>
+                        <div class="calendar"> <!-- calendar displays, but is broken :/ (changing the date and hovering other dates) -->
+                            <div class="calendar-header">
+                                <span class="month-picker" id="month-picker">February</span>
+                                <div class="year-picker">
+                                    <span class="year-change" id="prev-year">
+                                        <span class="glyphicon glyphicon-chevron-left"></span>
+                                    </span>
+                                    <span id="year">2021</span>
+                                    <span class="year-change" id="next-year">
+                                        <span class="glyphicon glyphicon-chevron-right"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="calendar-body">
+                                <div class="calendar-week-day">
+                                    <div>Sun</div>
+                                    <div>Mon</div>
+                                    <div>Tue</div>
+                                    <div>Wed</div>
+                                    <div>Thu</div>
+                                    <div>Fri</div>
+                                    <div>Sat</div>
+                                </div>
+                                <div class="calendar-days"></div>
+                            </div>
+                            <div class="calendar-footer">
+                            </div>
+                            <div class="month-list"></div>
+                        </div>
+                    </center>
+                </td>
+            </tr>
+            <tr>
+                <td class="section">
+                    <center>
+                        <iframe id="budget-iframe" src="" frameborder="0" width="100%" height="500"></iframe>
+                    </center>
+                </td>
+                <td class="section" style="border: none;">
+                    <table class="overview-info">
+                        <tr id="packing-check">
+                            <td>
+                                <h4>Packing Checklist</h4>
+                                <li>test</li> <!-- for loop surround li tag -->
+                            </td>
+                        </tr>
+                        <tr id="edit-hist">
+                            <td>
+                                <h4>Edit History</h4>
+                                <li>test</li> <!-- for loop surround li tag -->
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+    const client = {
+            apiKey: 'Jc2uhHaTMJMJUnblAaCbRBKMkth3QWyZKxvUy9xvXqHkmlvMPJFZpWvj',
+            search(query, perPage) {
+                const url = `https://api.pexels.com/v1/search?query=${query}&per_page=${perPage}`;
+                return axios.get(url, { headers: { Authorization: this.apiKey } });
+            }
+        };
+
+        function setBackgroundImages(images) {
+            // Get the second image
+            const secondImage = images[1].src.large;
+
+            // Get top row and bottom row elements
+            const topRow = document.getElementById('top-row');
+            const bottomRow = document.getElementById('bottom-row');
+
+            // Set background images for the top row and bottom row trips
+            const rows = [topRow, bottomRow];
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                for (let i = 0; i < cells.length; i++) {
+                    cells[i].style.backgroundImage = `url(${secondImage})`;
+                }
+            });
+        }
+
+        client.search('historical sites', 5).then(response => {
+            const photos = response.data.photos;
+            if (photos.length > 1) {
+                setBackgroundImages(photos);
+            } else {
+                console.error('Not enough photos returned.');
+            }
+        }).catch(error => {
+            console.error('Error fetching photos:', error);
+        });
+    document.addEventListener('DOMContentLoaded', (event) => {
+    const tripContainers = document.querySelectorAll('.trip td');
+    const budgetIframe = document.getElementById('budget-iframe');
+
+    tripContainers.forEach((tripContainer) => {
+        tripContainer.addEventListener('click', (event) => {
+            const circle = tripContainer.querySelector('.selector');
+            console.log(circle);
+            const tripId = tripContainer.getAttribute('data-trip-id');
+            console.log('Selected Trip ID:', tripId);
+
+            tripContainers.forEach((otherTripContainer) => {
+                const otherCircle = otherTripContainer.querySelector('.selector');
+                if (otherCircle) otherCircle.innerHTML = '';
+            });
+
+            if (circle) circle.innerHTML = '&#10003;';
+
+            const budgetUrl = `http://localhost:8000/budget/?trip_id=${tripId}`;
+            console.log(budgetUrl);
+            budgetIframe.src = budgetUrl;
+        });
+    });
+
+    const tripForm = document.getElementById('trip-form');
+    const createTripBtn = document.querySelector('.create-trip-btn');
+    const fieldsContainer = document.querySelector('.fields');
+
+    createTripBtn.addEventListener('click', () => {
+        fieldsContainer.style.display = 'block';
+        createTripBtn.style.display = 'none';  
+    });
+
+    tripForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const location = document.getElementById('location').value.trim();
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+
+        if (!location || !startDate || !endDate) {
+            alert('Please fill out all fields.');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            alert('End date must be after start date.');
+            return;
+        }
+
+        const tripData = {
+            location: location,
+            start_date: startDate,
+            end_date: endDate,
+        };
+
+        try {
+            const response = await fetch('/overview/', {  
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify(tripData),
+            });
+
+            if (response.ok) {
+                alert('Trip created successfully!');
+                tripForm.reset(); 
+                fieldsContainer.style.display = 'none'; 
+            } else {
+                alert('Error creating trip. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error creating trip. Please try again.');
+        }
+    });
+
+    let calendar = document.querySelector('.calendar');
+    const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || (year % 100 === 0 && year % 400 === 0);
+    const getFebDays = (year) => isLeapYear(year) ? 29 : 28;
+
+    const generateCalendar = (month, year) => {
+        let calendar_days = calendar.querySelector('.calendar-days');
+        let calendar_header_year = calendar.querySelector('#year');
+        let days_of_month = [31, getFebDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+        calendar_days.innerHTML = '';
+
+        let currDate = new Date();
+        if (!month) month = 0;
+        if (!year) year = currDate.getFullYear();
+
+        let curr_month = month_names[month];
+        month_picker.innerHTML = curr_month;
+        calendar_header_year.innerHTML = year;
+
+        let first_day = new Date(year, month, 1);
+
+        for (let i = 0; i <= days_of_month[month] + first_day.getDay() - 1; i++) {
+            let day = document.createElement('div');
+            if (i >= first_day.getDay()) {
+                let dayNumber = i - first_day.getDay() + 1;
+                day.classList.add('calendar-day-hover');
+                day.innerHTML = dayNumber + `<span></span><span></span><span></span><span></span>`;
+                if (dayNumber === currDate.getDate() && year === currDate.getFullYear() && month === currDate.getMonth()) {
+                    day.classList.add('curr-date');
+                }
+                day.setAttribute('data-date', `${year}-${month + 1}-${dayNumber}`);
+            }
+            calendar_days.appendChild(day);
+        }
+
+        if (selectedDate) {
+            let selectedDateElement = Array.from(calendar_days.children).find(day => day.getAttribute('data-date') === selectedDate);
+            if (selectedDateElement) {
+                selectedDateElement.classList.add('selected-date');
+            }
+        }
+    };
+
+    let month_list = calendar.querySelector('.month-list');
+
+    month_names.forEach((e, index) => {
+        let month = document.createElement('div');
+        month.innerHTML = `<div data-month="${index}">${e}</div>`;
+        month.querySelector('div').onclick = () => {
+            month_list.classList.remove('show');
+            curr_month.value = index;
+            generateCalendar(index, curr_year.value);
+            selectedDate = null; 
+        };
+        month_list.appendChild(month);
+    });
+
+    let month_picker = calendar.querySelector('#month-picker');
+    month_picker.onclick = () => month_list.classList.add('show');
+
+    let currDate = new Date();
+    let curr_month = { value: currDate.getMonth() };
+    let curr_year = { value: currDate.getFullYear() };
+    let selectedDate = null;
+
+    generateCalendar(curr_month.value, curr_year.value);
+
+    document.querySelector('#prev-year').onclick = () => {
+        --curr_year.value;
+        generateCalendar(curr_month.value, curr_year.value);
+        selectedDate = null; 
+    };
+
+    document.querySelector('#next-year').onclick = () => {
+        ++curr_year.value;
+        generateCalendar(curr_month.value, curr_year.value);
+        selectedDate = null; 
+    };
+
+    const calendarDays = document.querySelectorAll('.calendar-days div');
+
+    calendarDays.forEach(day => {
+        day.addEventListener('click', () => {
+            if (selectedDate) {
+                let prevSelectedDate = Array.from(calendarDays).find(day => day.getAttribute('data-date') === selectedDate);
+                if (prevSelectedDate) {
+                    prevSelectedDate.classList.remove('selected-date');
+                }
+            }
+            if (day.classList.contains('calendar-day-hover')) {
+                day.classList.add('selected-date');
+                selectedDate = day.getAttribute('data-date');
+            }
+        });
+    });
+
+    document.querySelectorAll('.month-picker, .year-change').forEach(button => {
+        button.addEventListener('click', () => {
+            if (selectedDate) {
+                let prevSelectedDate = Array.from(calendarDays).find(day => day.getAttribute('data-date') === selectedDate);
+                if (prevSelectedDate) {
+                    prevSelectedDate.classList.remove('selected-date');
+                }
+                selectedDate = null;
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

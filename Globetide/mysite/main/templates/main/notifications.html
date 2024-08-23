@@ -1,0 +1,483 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<style>
+    .dropdown-list-image {
+        position: relative;
+        height: 2.5rem;
+        width: 2.5rem;
+    }
+    .dropdown-list-image img {
+        height: 2.5rem;
+        width: 2.5rem;
+    }
+    .btn-light {
+        color: #2cdd9b;
+        background-color: #e5f7f0;
+        border-color: #d8f7eb;
+    }
+    .container {
+        padding-top: 5vw;
+        min-height: 100vh;
+    }
+    .calendar {
+        height: max-content;
+        width: max-content;
+        background-color: var(--bg-main);
+        border-radius: 30px;
+        position: relative; 
+        right: 0.8vw;
+        overflow: hidden;
+        top: 40%; 
+        transform: translateY(-50%);
+        transform: scale(0.7);
+        z-index: 100; 
+    }
+
+
+    .light .calendar {
+        box-shadow: var(--shadow);
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 30px;
+        font-weight: 600;
+        color: var(--color-txt);
+        padding: 10px;
+    }
+
+    .calendar-body {
+        padding: 10px;
+    }
+
+    .calendar-week-day {
+        height: 50px;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        font-weight: 600;
+        font-size: 20px;
+    }
+
+    .calendar-week-day div {
+        display: grid;
+        place-items: center;
+        color: var(--bg-second);
+    }
+
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        color: var(--color-txt);
+        font-size: 20px;
+    }
+
+    .calendar-days div {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+        position: relative;
+        cursor: pointer;
+        animation: to-top 1s forwards;
+        /* border-radius: 50%; */
+    }
+
+    .calendar-days div span {
+        position: absolute;
+    }
+
+    .calendar-days div:hover span {
+        transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+    }
+
+    .calendar-days div span:nth-child(1),
+    .calendar-days div span:nth-child(3) {
+        width: 2px;
+        height: 0;
+        background-color: var(--color-txt);
+    }
+
+    .calendar-days div:hover span:nth-child(1),
+    .calendar-days div:hover span:nth-child(3) {
+        height: 100%;
+    }
+
+    .calendar-days div span:nth-child(1) {
+        bottom: 0;
+        left: 0;
+    }
+
+    .calendar-days div span:nth-child(3) {
+        top: 0;
+        right: 0;
+    }
+
+    .calendar-days div span:nth-child(2),
+    .calendar-days div span:nth-child(4) {
+        width: 0;
+        height: 2px;
+        background-color: var(--color-txt);
+    }
+
+    .calendar-days div:hover span:nth-child(2),
+    .calendar-days div:hover span:nth-child(4) {
+        width: 100%;
+    }
+
+    .calendar-days div span:nth-child(2) {
+        top: 0;
+        left: 0;
+    }
+
+    .calendar-days div span:nth-child(4) {
+        bottom: 0;
+        right: 0;
+    }
+
+    .calendar-days div:hover span:nth-child(2) {
+        transition-delay: 0.2s;
+    }
+
+    .calendar-days div:hover span:nth-child(3) {
+        transition-delay: 0.4s;
+    }
+
+    .calendar-days div:hover span:nth-child(4) {
+        transition-delay: 0.6s;
+    }
+
+    .calendar-days div.curr-date,
+    .calendar-days div.curr-date:hover {
+        background-color: var(--blue);
+        color: var(--white);
+        border-radius: 50%;
+    }
+
+    .calendar-days div.curr-date span {
+        display: none;
+    }
+
+    .month-picker {
+        padding: 5px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .month-picker:hover {
+        background-color: var(--color-hover);
+    }
+
+    .year-picker {
+        display: flex;
+        align-items: center;
+    }
+
+    .year-change {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        margin: 0 10px;
+        cursor: pointer;
+    }
+
+    .year-change:hover {
+        background-color: var(--color-hover);
+    }
+
+    .calendar-footer {
+        padding: 10px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .toggle {
+        display: flex;
+    }
+
+    .toggle span {
+        margin-right: 10px;
+        color: var(--color-txt);
+    }
+
+    .month-list {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: var(--bg-main);
+        padding: 20px;
+        grid-template-columns: repeat(3, auto);
+        gap: 5px;
+        display: grid;
+        transform: scale(1.5);
+        background-color: white;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .month-list.show {
+        transform: scale(1);
+        visibility: visible;
+        pointer-events: visible;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .month-list > div {
+        display: grid;
+        place-items: center;
+    }
+
+    .month-list > div > div {
+        width: 100%;
+        padding: 5px 20px;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        color: var(--color-txt);
+    }
+
+    .month-list > div > div:hover {
+        background-color: var(--color-hover);
+    }
+
+    @keyframes to-top {
+        0% {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    @import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.css";
+</style>
+
+{% block stylesheet %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css" integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="calendar.css">
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 left">
+            <div class="box shadow-sm mb-3 rounded bg-white ads-box text-center">
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <span class="month-picker" id="month-picker">February</span>
+                        <div class="year-picker">
+                            <span class="year-change" id="prev-year">
+                                <pre><</pre>
+                            </span>
+                            <span id="year">2021</span>
+                            <span class="year-change" id="next-year">
+                                <pre>></pre>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="calendar-body">
+                        <div class="calendar-week-day">
+                            <div>Sun</div>
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                            <div>Sat</div>
+                        </div>
+                        <div class="calendar-days"></div>
+                    </div>
+                    <div class="calendar-footer">
+                    </div>
+                    <div class="month-list"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 right">
+            <div class="box shadow-sm rounded bg-white mb-3">
+                <div class="box-title border-bottom p-3">
+                    <h6 class="m-0">Recent</h6>
+                </div>
+                {% for n in recent %}
+                <div class="box-body p-0">
+                    <div class="p-3 d-flex align-items-center bg-light border-bottom osahan-post-header">
+                        <div class="dropdown-list-image mr-3">
+                            <img class="rounded-circle" src="https://i.pinimg.com/736x/5b/fc/61/5bfc6199726c41cfc042561ae1d72ccc.jpg" alt="" />
+                        </div>
+                        <div class="font-weight-bold mr-3">
+                            <div class="text-truncate">{{ n.title }}</div>
+                            <div class="small">{% if n.link %}<a href="{{ n.link }}">{{ n.description }}</a>{% else %}{{ n.description }}{% endif %}</div>
+                        </div>
+                        <span class="ml-auto mb-auto">
+                            <div class="text-right text-muted pt-1">{{ n.date }}</div>
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if not recent %}
+                <div class="box-body p-0">
+                    <div class="p-3 d-flex align-items-center bg-light border-bottom osahan-post-header">
+                        <div class="dropdown-list-image mr-3">
+                            <img class="rounded-circle" alt="" />
+                        </div>
+                        <div class="font-weight-bold mr-3">
+                            <div class="text-truncate"></div>
+                            <div class="small">You're all caught up!</div>
+                        </div>
+                        <span class="ml-auto mb-auto">
+                            <div class="text-right text-muted pt-1"></div>
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="box shadow-sm rounded bg-white mb-3">
+                <div class="box-title border-bottom p-3">
+                    <h6 class="m-0">Earlier</h6>
+                </div>
+                {% for n in earlier %}
+                <div class="box-body p-0">
+                    <div class="p-3 d-flex align-items-center border-bottom osahan-post-header">
+                        <div class="dropdown-list-image mr-3">
+                            <img class="rounded-circle" src="https://i.pinimg.com/736x/5b/fc/61/5bfc6199726c41cfc042561ae1d72ccc.jpg" alt="" />
+                        </div>
+                        <div class="font-weight-bold mr-3">
+                            <div class="text-truncate">{{ n.title }}</div>
+                            <div class="small">{% if n.link %}<a href="{{ n.link }}">{{ n.description }}</a>{% else %}{{ n.description }}{% endif %}</div>
+                        </div>
+                        <span class="ml-auto mb-auto">
+                            <div class="text-right text-muted pt-1">{{ n.date }}</div>
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let calendar = document.querySelector('.calendar')
+
+    const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+    isLeapYear = (year) => {
+        return (year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0) || (year % 100 === 0 && year % 400 === 0)
+    }
+
+    getFebDays = (year) => {
+        return isLeapYear(year) ? 29 : 28
+    }
+
+    generateCalendar = (month, year) => {
+
+        let calendar_days = calendar.querySelector('.calendar-days')
+        let calendar_header_year = calendar.querySelector('#year')
+
+        let days_of_month = [31, getFebDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+        calendar_days.innerHTML = ''
+
+        let currDate = new Date()
+        if (!month) month = currDate.getMonth()
+        if (!year) year = currDate.getFullYear()
+
+        let curr_month = `${month_names[month]}`
+        month_picker.innerHTML = curr_month
+        calendar_header_year.innerHTML = year
+
+        // get first day of month
+
+        let first_day = new Date(year, month, 1)
+
+        for (let i = 0; i <= days_of_month[month] + first_day.getDay() - 1; i++) {
+            let day = document.createElement('div')
+            if (i >= first_day.getDay()) {
+                day.classList.add('calendar-day-hover')
+                day.innerHTML = i - first_day.getDay() + 1
+                day.innerHTML += `<span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>`
+                if (i - first_day.getDay() + 1 === currDate.getDate() && year === currDate.getFullYear() && month === currDate.getMonth()) {
+                    day.classList.add('curr-date')
+                }
+            }
+            calendar_days.appendChild(day)
+        }
+    }
+
+    let month_list = calendar.querySelector('.month-list')
+
+    month_names.forEach((e, index) => {
+        let month = document.createElement('div')
+        month.innerHTML = `<div data-month="${index}">${e}</div>`
+        month.querySelector('div').onclick = () => {
+            month_list.classList.remove('show')
+            curr_month.value = index
+            generateCalendar(index, curr_year.value)
+        }
+        month_list.appendChild(month)
+    })
+
+    let month_picker = calendar.querySelector('#month-picker')
+
+    month_picker.onclick = () => {
+        month_list.classList.add('show')
+    }
+
+    let currDate = new Date()
+
+    let curr_month = { value: currDate.getMonth() }
+    let curr_year = { value: currDate.getFullYear() }
+
+    generateCalendar(curr_month.value, curr_year.value)
+
+    document.querySelector('#prev-year').onclick = () => {
+        --curr_year.value
+        generateCalendar(curr_month.value, curr_year.value)
+    }
+
+    document.querySelector('#next-year').onclick = () => {
+        ++curr_year.value
+        generateCalendar(curr_month.value, curr_year.value)
+    }
+
+    let dark_mode_toggle = document.querySelector('.dark-mode-switch')
+
+    dark_mode_toggle.onclick = () => {
+        document.querySelector('body').classList.toggle('light')
+        document.querySelector('body').classList.toggle('dark')
+    }
+
+    calendar_days.addEventListener('click', (e) => {
+        if (e.target.classList.contains('calendar-day-hover')) {
+            const currDate = document.querySelector('.curr-date');
+            if (currDate) {
+                currDate.classList.remove('curr-date');
+                currDate.style.backgroundColor = ''; // remove blue color
+            }
+            e.target.classList.add('curr-date');
+            e.target.style.backgroundColor = 'blue'; // add blue color to new date
+        }
+        });
+    </script>
+
+{% endblock %}

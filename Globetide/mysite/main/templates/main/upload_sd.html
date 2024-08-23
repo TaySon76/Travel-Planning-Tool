@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Display</title>
+    <style>
+        #image-container {
+            width: 300px;
+            height: 300px;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 20px auto;
+        }
+        #image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="image-container" onclick="document.getElementById('file-input').click();">
+        <span>Click to upload an image</span>
+        <img id="displayed-image" src="" alt="Uploaded Image">
+    </div>
+    <input type="file" id="file-input" style="display:none;" accept="image/*" onchange="handleFileSelect(event)">
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <script>
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64String = e.target.result.split(',')[1];
+
+                const response = await fetch('/upload_sd/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.getElementById('csrf_token').value
+                    },
+                    body: new URLSearchParams({ image_data: base64String })
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    const imgElement = document.getElementById('displayed-image');
+                    imgElement.src = 'data:image/png;base64,' + result.decrypted_data;
+                    imgElement.style.display = 'block';
+                    document.querySelector('#image-container span').style.display = 'none';
+                } else {
+                    console.error(result.error);
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>

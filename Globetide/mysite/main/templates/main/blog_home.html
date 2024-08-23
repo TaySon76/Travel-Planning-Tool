@@ -1,0 +1,271 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+{% load extras %}
+
+<style>
+    body {
+        overflow-X: hidden;
+    }
+
+    #backimage {
+        width: 100%;
+        height: 30vh;
+        overflow: hidden;
+        position: relative;
+    }
+
+    #backimage img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures the image covers the container */
+        object-position: center center; /* Positions the middle of the image in the center */
+    }
+
+    #center {
+        width: 100%;
+        top: 7vw;
+        position: absolute;
+    }
+
+    #center h1 {
+        text-align: center;
+        color: white;
+    }
+
+    .blog-select {
+        position: relative;
+        left: auto;
+        right: auto;
+        background-color: white;
+    }
+
+    .blog-select-table {
+        position: relative;
+        border-spacing: 40px;
+        border-collapse: separate;
+        left: calc((100vw - 3 * 314px - 4 * 40px) / 2);
+    }
+
+    .blog-select-table td {
+        text-align: center;
+        width: 314px;
+        height: 260px;
+        background-size: cover; /* Ensures the image covers the container */
+        background-repeat:   no-repeat;
+        background-position: center center; /* Positions the middle of the image in the center */
+    }
+
+    button {
+        width: 50%;
+        height: 23%;
+        background-color: white;
+        border: None;
+        color: #2573DA;
+        font-size: 20px;
+    }
+
+    button:hover {
+        background-color: #2573DA;
+        color: white;
+    }
+
+    .hold-blogs {
+        width: 100vw;
+        margin-bottom: 80px;
+    }
+
+    .blog {
+        background-color: white;
+        width: 940px;
+        position: relative;
+        left: calc((100vw - 940px) / 2);
+        margin-top: 40px;
+        height: fit-content;
+        padding-bottom: 20px;
+    }
+
+    .blog img {
+        width: 100%;
+        height: 530px;
+    }
+
+    .blog p {
+        position: absolute;
+        left: 76px;
+        padding-top: 30px;
+        font-size: 90%;
+    }
+
+    .blog h2, .blog h4 {
+        position: relative;
+        left: 30px;
+        width: 880px;
+    }
+
+    .profile-photo {
+        margin-top: 30px;
+        margin-left: 30px;
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #545454;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+    
+    .profile-photo img {
+        max-width: 100%; /* Ensure the image does not exceed the container width */
+        max-height: 100%; /* Ensure the image does not exceed the container height */
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: none;
+    }
+
+    .profile-photo .glyphicon-user {
+        font-size: 15px;
+        color: white;
+    }
+
+    .write-blog {
+        position: fixed;
+        left: auto;
+        right: 50px;
+        bottom: 50px;
+        top: auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 50%;
+        color: #2573DA;
+    }
+
+    .write-blog:hover {
+        background-color: #2573DA;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+
+<body>
+    <div id="backimage">
+        <img 
+        {% if category == 'all' %}
+            src="https://images.pexels.com/photos/1271619/pexels-photo-1271619.jpeg"
+        {% elif category == 'travel' %}
+            src="https://images.pexels.com/photos/3278215/pexels-photo-3278215.jpeg?cs=srgb&dl=pexels-freestockpro-3278215.jpg&fm=jpg"
+        {% elif category == 'eat' %}
+            src="https://images.pexels.com/photos/568370/pexels-photo-568370.jpeg"
+        {% else %}
+            src="https://images.pexels.com/photos/2398220/pexels-photo-2398220.jpeg"
+        {% endif %}>
+    </div>
+
+    <div id="center">
+        <h1 style="font-size: 8vh; font-family: copperplate;">Travel Blog</h1>
+    </div>
+
+    <div class="blog-select">
+        <table class="blog-select-table">
+            {% if category == 'all' %}
+                <td style="background-image: url(https://images.pexels.com/photos/16376256/pexels-photo-16376256/free-photo-of-taj-mahal-palace-hotel-in-mumbai.jpeg);">
+                    <a href="/blog/travel">
+                        <button>Travel</button>
+                    </a>
+                </td>
+                <td style="background-image: url(https://images.pexels.com/photos/12061487/pexels-photo-12061487.jpeg);">
+                    <a href="/blog/eat">
+                        <button>Eat</button>
+                    </a>
+                </td>
+                <td style="background-image: url(https://images.pexels.com/photos/1585960/pexels-photo-1585960.jpeg);">
+                    <a href="/blog/relax">
+                        <button>Relax</button>
+                    </a>
+                </td>
+            {% elif category == 'travel' %}
+                <td style="background-image: url(https://images.pexels.com/photos/16376256/pexels-photo-16376256/free-photo-of-taj-mahal-palace-hotel-in-mumbai.jpeg);">
+                    <a href="/blog/all">
+                        <button>All</button>
+                    </a>
+                </td>
+                <td style="background-image: url(https://images.pexels.com/photos/12061487/pexels-photo-12061487.jpeg);">
+                    <a href="/blog/eat">
+                        <button>Eat</button>
+                    </a>
+                </td>
+                <td style="background-image: url(https://images.pexels.com/photos/1585960/pexels-photo-1585960.jpeg);">
+                    <a href="/blog/relax">
+                        <button>Relax</button>
+                    </a>
+                </td>
+            {% elif category == 'eat' %}
+                <td style="background-image: url(https://images.pexels.com/photos/16376256/pexels-photo-16376256/free-photo-of-taj-mahal-palace-hotel-in-mumbai.jpeg);">
+                    <a href="/blog/travel">
+                        <button>Travel</button>
+                    </a>
+                </td>
+                <td style="background-image: url(https://images.pexels.com/photos/12061487/pexels-photo-12061487.jpeg);">
+                    <a href="/blog/all">
+                        <button>All</button>
+                    </a>
+                </td>
+                <td style="background-image: url(https://images.pexels.com/photos/1585960/pexels-photo-1585960.jpeg);">
+                    <a href="/blog/relax">
+                        <button>Relax</button>
+                    </a>
+                </td>
+            {% else %}
+                <td style="background-image: url(https://images.pexels.com/photos/16376256/pexels-photo-16376256/free-photo-of-taj-mahal-palace-hotel-in-mumbai.jpeg);">
+                    <a href="/blog/travel">
+                        <button>Travel</button>
+                    </a>
+                </td>
+                <td style="background-image: url(https://images.pexels.com/photos/12061487/pexels-photo-12061487.jpeg);">
+                    <a href="/blog/eat">
+                        <button>Eat</button>
+                    </a>
+                </td>
+                <td style="background-image: url(https://images.pexels.com/photos/1585960/pexels-photo-1585960.jpeg);">
+                    <a href="/blog/all">
+                        <button>All</button>
+                    </a>
+                </td>
+            {% endif %}
+        </table>
+    </div>
+
+    <hr style="border: 1px solid lightgray;">
+
+    <div class="hold-blogs">
+        {% for blog in blogs %}
+            <div class="blog">
+                <img src="https://static.wixstatic.com/media/ae5901bd4fda41009c4cc4a19bb70d05.jpg/v1/fill/w_940,h_529,fp_0.50_0.50,q_90,enc_auto/ae5901bd4fda41009c4cc4a19bb70d05.jpg">
+                <p>{{ blog.user.username }}<br>{{ blog.date }}</p>
+                <div class="profile-photo">
+                    <img id="profile-img" src="#" alt="Profile Photo">
+                    <span class="glyphicon glyphicon-user"></span>
+                </div>
+                <h2>{{ blog.title }}</h2>
+                <h4>{{ blog.subtitle }}</h4>
+                <hr width="880px">
+                <p style="padding-top: 2px; left: 50px;">{{ blog.views }}</p>
+                <p style="padding-top: 2px; left: 120px;">{{ blog|get_num_comments }}</p>
+                <p style="padding-top: 2px; width: 100%; left: -60px; text-align: right;">{{ blog.likes }}</p>
+                <span class="glyphicon glyphicon-eye-open" style="left: 30px;"></span>
+                <span class="glyphicon glyphicon-comment" style="left: 80px;"></span>
+                <span class="glyphicon glyphicon-heart-empty" style="left: 850px; color: red;"></span>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="write-blog" onclick= "window.location.href = '/create-blog'" title="Create Blog Post">
+        <span class="glyphicon glyphicon-edit" style="font-size: 35px; text-align: center;"></span>
+    </div>
+
+</body>
+
+{% endblock %}

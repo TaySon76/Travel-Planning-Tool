@@ -1,0 +1,126 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+
+<style>
+    #backimage {
+        width: 100%;
+        height: 46vh;
+        overflow: hidden;
+        position: relative;
+    }
+
+    #backimage img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures the image covers the container */
+        object-position: center center; /* Positions the middle of the image in the center */
+    }
+
+    #center {
+        width: 100%;
+        top: 5vw;
+        position: absolute;
+    }
+
+    #center h1 {
+        text-align: center;
+    }
+
+    #top-destination-odd {
+        padding-left: 20px;
+        width: 100%;
+        height: 30vh;
+        position: relative;
+    }
+
+    #top-destination-odd img {
+        clip-path: circle();
+        overflow: hidden;
+        width: 30vh;
+        height: 30vh;
+        object-fit: cover;
+    }
+
+    #top-destination-odd h1 {
+        position: relative;
+        left: calc(30vh + 50px);
+        top: -30vh;
+        overflow-wrap: break-word;
+        width: calc(100% - (30vh + 50px));
+    }
+
+    #top-destination-odd p {
+        position: relative;
+        left: calc(30vh + 50px);
+        top: -30vh;
+        overflow-wrap: break-word;
+        width: calc(100% - (30vh + 50px));
+    }
+
+    #top-destination-even {
+        padding-left: 20px;
+        width: 100%;
+        height: 30vh;
+        position: relative;
+    }
+
+    #top-destination-even img {
+        clip-path: circle(15vh at calc(100% - 15vh - 20px) 50%);
+        overflow: hidden;
+        padding-left: calc(100% - 30vh - 20px);
+        width: 100%;
+        height: 30vh;
+        object-fit: cover;
+    }
+
+    #top-destination-even h1 {
+        position: relative;
+        top: -30vh;
+        overflow-wrap: break-word;
+        width: calc(100% - (30vh + 70px));
+        text-align: right;
+    }
+
+    #top-destination-even p {
+        position: relative;
+        top: -30vh;
+        overflow-wrap: break-word;
+        width: calc(100% - (30vh + 70px));
+        text-align: right;
+    }
+</style>
+
+<body style="background-color: #CBD3F4;">
+<title>vigil</title>
+
+<div id="backimage">
+    <img src="https://res.klook.com/image/upload/Mobile/City/swox6wjsl5ndvkv5jvum.jpg">
+</div>
+
+<div id="center">
+    <h1 style="font-size: 8vh; font-family: copperplate;">Globetide</h1>
+    <div class="search-container" style="left: 25vw; padding-left: 0;">
+        <input type="text" placeholder="Enter Desitnation" class="search-bar" style="width: 50vw;">
+    </div>
+</div>
+
+<h1 style="padding-top: 10vh; text-align: center;">Top Destinations</h1>
+
+<div id="top-destination-odd">
+    <img src="https://cdn.kimkim.com/files/a/images/36b373c453465b0c924c250aaef9a40e2aaeed59/big-b0832a51191758885812c41e3a36375a.jpg">
+    <h1>Test</h1>
+    <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+</div>
+<div id="top-destination-even" style="padding-top: 50px;">
+    <img src="https://cdn.kimkim.com/files/a/images/36b373c453465b0c924c250aaef9a40e2aaeed59/big-b0832a51191758885812c41e3a36375a.jpg">
+    <h1>Test</h1>
+    <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+</div>
+<div id="top-destination-odd" style="padding-top: 100px;">
+    <img src="https://cdn.kimkim.com/files/a/images/36b373c453465b0c924c250aaef9a40e2aaeed59/big-b0832a51191758885812c41e3a36375a.jpg">
+    <h1>Test</h1>
+    <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+</div>
+</body>
+{% endblock %}

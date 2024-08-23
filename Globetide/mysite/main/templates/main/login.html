@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *:before,
+        *:after {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #CBD3F4;
+            height: 100vh;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+        .stars, .moons, .rockets, .planets {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+        .stars i, .moons i, .rockets i, .planets i {
+            position: absolute;
+            color: white;
+        }
+        .stars i {
+            font-size: 4px;
+        }
+        .moons i, .rockets i, .planets i {
+            font-size: 30px;
+            animation-duration: 5s;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+        }
+        .moons i {
+            color: #f1c40f;
+            animation-name: moonAnimation;
+        }
+        .rockets i {
+            color: #e74c3c;
+            animation-name: rocketAnimation;
+        }
+        @keyframes moonAnimation {
+            0%, 100% {
+                transform: translateY(-10px);
+            }
+            50% {
+                transform: translateY(10px);
+            }
+        }
+        @keyframes rocketAnimation {
+            0%, 100% {
+                transform: translateY(-20px);
+            }
+            50% {
+                transform: translateY(20px);
+            }
+        }
+        .planets i {
+            font-size: 50px;
+            color: #3498db;
+            animation-name: planetAnimation;
+            animation-duration: 10s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        @keyframes planetAnimation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        form {
+            width: 450px;
+            background-color: rgb(255, 255, 255);
+            z-index: 1000;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+            padding: 50px 35px;
+            transition: height 0.3s ease;
+        }
+        form.extended {
+            height: 700px;
+        }
+        form * {
+            font-family: 'Poppins', sans-serif;
+            color: #000000;
+            letter-spacing: 0.5px;
+            outline: none;
+            border: none;
+        }
+        form h3 {
+            font-size: 32px;
+            font-weight: 500;
+            line-height: 42px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 30px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        input {
+            display: block;
+            height: 40px;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.07);
+            border-radius: 3px;
+            padding: 0 10px;
+            margin-top: 2px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        ::placeholder {
+            color: #000000;
+        }
+        button {
+            margin-top: 14px;
+            width: 100%;
+            background-color: #000000;
+            color: #ffffff;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .social {
+            margin-top: 30px;
+            display: flex;
+        }
+        .social div {
+            width: 150px;
+            border-radius: 3px;
+            padding: 5px 10px 10px 5px;
+            background-color: rgba(255, 255, 255, 0.27);
+            color: #eaf0fb;
+            text-align: center;
+        }
+        .social div:hover {
+            background-color: rgba(0, 0, 0, 0.47);
+        }
+        .social .fb {
+            margin-left: 25px;
+        }
+        .social i {
+            margin-right: 4px;
+        }
+
+        .centered {
+            text-align: center;
+        }
+
+        a {
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="" method="post" id="login-form" onsubmit="return validateForm()">
+            {% csrf_token %} 
+            <h3>Login</h3>
+
+            <label for="username">Username</label>
+            <input type="text" placeholder="Username" name="username" id="username">
+
+            <label for="password1">Password</label>
+            <input type="password" placeholder="Password" id="password1" name="password1">
+
+            <button type="submit" id="login-button">Login</button>
+            
+            <div class="centered">
+                <a href="/">I don't have an account</a>
+                <br>
+                <a href="/reset_check_email">Forgot your password?</a>
+            </div>
+
+            <div id="error-message" class="error-message"></div>
+        </form>
+    </div>
+
+    <div class="stars">
+        <i class="fas fa-star" style="top: 10%; left: 20%;"></i>
+        <i class="fas fa-star" style="top: 30%; left: 60%;"></i>
+        <i class="fas fa-star" style="top: 50%; left: 80%;"></i>
+        <i class="fas fa-star" style="top: 70%; left: 40%;"></i>
+        <i class="fas fa-star" style="top: 90%; left: 10%;"></i>
+        <i class="fas fa-star" style="top: 15%; left: 35%;"></i>
+        <i class="fas fa-star" style="top: 45%; left: 75%;"></i>
+        <i class="fas fa-star" style="top: 65%; left: 25%;"></i>
+        <i class="fas fa-star" style="top: 85%; left: 55%;"></i>
+        <i class="fas fa-star" style="top: 25%; left: 90%;"></i>
+    </div>
+    <div class="moons">
+        <i class="fas fa-moon" style="top: 20%; left: 30%;"></i>
+        <i class="fas fa-moon" style="top: 70%; left: 70%;"></i>
+        <i class="fas fa-moon" style="top: 50%; left: 50%;"></i>
+        <i class="fas fa-moon" style="top: 40%; left: 20%;"></i>
+        <i class="fas fa-moon" style="top: 80%; left: 80%;"></i>
+    </div>
+    <div class="rockets">
+        <i class="fas fa-rocket" style="top: 40%; left: 50%;"></i>
+        <i class="fas fa-rocket" style="top: 80%; left: 20%;"></i>
+        <i class="fas fa-rocket" style="top: 60%; left: 80%;"></i>
+        <i class="fas fa-rocket" style="top: 20%; left: 40%;"></i>
+        <i class="fas fa-rocket" style="top: 70%; left: 60%;"></i>
+    </div>
+    <div class="planets">
+        <i class="fas fa-globe" style="top: 10%; left: 80%;"></i>
+        <i class="fas fa-globe" style="top: 50%; left: 30%;"></i>
+        <i class="fas fa-globe" style="top: 30%; left: 10%;"></i>
+        <i class="fas fa-globe" style="top: 70%; left: 90%;"></i>
+        <i class="fas fa-globe" style="top: 90%; left: 50%;"></i>
+    </div>
+
+    <script>
+    function validateForm() {
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password1").value;
+
+        clearErrorMessages();
+
+        if (username.trim() === "") {
+            displayErrorMessage("Username cannot be empty");
+            return false;
+        }
+
+        if (password.trim() === "") {
+            displayErrorMessage("Password cannot be empty");
+            return false;
+        }
+
+        return true;
+    }
+
+    function displayErrorMessage(message) {
+        var errorMessage = document.getElementById("error-message");
+        errorMessage.innerText = message;
+    }
+
+    function clearErrorMessages() {
+        var errorMessage = document.getElementById("error-message");
+        errorMessage.innerText = "";
+    }
+    </script>
+</body>
+</html>

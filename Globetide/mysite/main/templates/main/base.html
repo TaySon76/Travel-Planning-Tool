@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+<head>
+    
+    {% block stylesheet %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    {% endblock %}
+
+    <title>Globetide Planning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    
+    .topnav {
+        position: absolute;
+        width: 100%;
+        height: 4vw;
+        border-bottom: 1px solid #ededed;
+        display: flex; 
+        z-index: 4;
+        font-family: "Courier New", Courier, monospace;
+        z-index: 1;
+        margin: 0;
+    }
+
+    .topnav a:not(#special):not(#img) {
+        color: #000;  
+        text-align: center;
+        padding: 1.5vw 1vw;
+        text-decoration: none;
+        font-size: 0.9vw;
+        font-weight: italic;  
+        background-color: transparent;  
+        position: relative;  
+        transition: color 0.3s;
+        z-index: 5;
+    }
+
+    .topnav a:not(#special).active {
+        background-color: transparent;  
+        color: black;
+        height: 4vw;
+        z-index: 5;
+    }
+
+    .topnav a:not(#special):not(#img):hover {
+        color: red;
+        z-index: 5;
+    }
+
+    .topnav a:not(#special):not(#img)::after {
+        content: "";  
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 2px;  
+        width: 0%;  
+        background-color: red;  
+        transition: width 0.3s;
+        z-index: 5;
+    }
+
+    .topnav a:not(#special):not(#img):hover::after {
+        width: 100%;
+        z-index: 5;
+    }
+
+    .icon {
+        height: 4vw;
+        width: auto;
+        padding: 1.5vw 1vw;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    .notify {
+        height: 4vw;
+        width: auto;
+        padding: 1.5vw 1vw;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .icon:hover {
+        transform: translateY(-10px);
+    }
+
+    #special {
+        position: absolute;
+        margin-top: 0.1vh;
+        margin-right: 0.1vw;
+        width: 0px;
+        left: -1px;
+    }
+
+    #img {
+        position: absolute;
+        margin-top: 0.1vh;
+        margin-left: -2vw;
+        width: 0px;
+        left: -1px;
+        z-index: 5;
+    }
+
+    .company-logo {
+        max-height: 100%;
+        float: left; 
+        width: 3vw; 
+        height: 3vw; 
+        overflow: hidden; 
+        margin-top: 6px;
+        margin-left: 5.2vw;
+
+    }   
+
+    .search-container {
+        position: absolute; 
+        padding-right: 2vw;
+        padding-top: 1.5vw;
+        padding-bottom: 3vw;
+        padding: 0.5vw;
+        margin-top: -0.3vw;
+        margin-bottom: 0.5px;
+        color: #fff;
+    }
+
+    .search-bar {
+        border: 1px solid #f6f6f6; 
+        padding: 0.5vw;
+        padding-left: 20px;
+        border-radius: 10px;
+        margin-top: 0.5vw;
+        background-color: #eeeeee; 
+        color: #000000;
+        height: 2.5vw;
+    }
+
+    .search-bar::placeholder {
+        color: #000000; 
+        font-family: "Courier New", Courier, monospace;
+    }
+    </style>
+</head>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const screenWidth = window.innerWidth;
+    const searchContainer = document.querySelector('.search-container');
+    const searchBar = document.querySelector('.search-bar');
+    const user = document.querySelector('#user');
+    const bell = document.querySelector('#bell');
+    
+    searchContainer.style.paddingLeft = `${screenWidth - screenWidth * 0.208 - screenWidth*3/100 - 150}px`;
+    searchBar.style.width = `${screenWidth * 0.208}px`;
+    user.style.marginLeft = `${screenWidth - screenWidth*1.5/100 - 90}px`;
+    bell.style.marginLeft = `${screenWidth - screenWidth*1.5/100 - 150}px`;
+});
+
+</script>
+
+
+<div class="topnav" style="background-color: white;">
+    <a id="img" href="/home"><img class="company-logo" src="https://images.creativemarket.com/0.1.0/ps/1037209/7917/5269/m1/fpnw/wm0/low-poly-colorful-icon-plane-.png?1&s=dec92b172f11ab1e4361f348cf763d9e" alt="Company Logo"></a>
+    <a class="active" href="/home" style="margin-left: 7vw;">Home</a>
+    <a class="active" href="/">Itineraries</a>
+    <a class="active" href="/">Hotels and Flights</a>
+    <a class="active" href="/">Trending</a>
+    <a class="active" href="/">Travel Guides and Blogs</a>
+    <div class="search-container">
+        <input type="text" placeholder="Enter Desitnation" class="search-bar">
+    </div>
+    <a id="special" href="/profile"><img class="icon" id="user" src="{% static 'main/user.png' %}"></i></a>
+    <a id="special" href="/notifications"><img class="icon" id="bell" src={% if notify %}"{% static 'main/bellrednoti.png' %}"{% else %}"{% static 'main/bell.png' %}"{% endif %}></i></a>
+</div>
+
+{% block content %}
+{% endblock %}
+
+</html>

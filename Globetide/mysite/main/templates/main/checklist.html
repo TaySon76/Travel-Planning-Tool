@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <title>To-Do List</title>
+    <style>
+        :root {
+            --text_color--todo: white;
+            --text_color--complete: lightgray;
+            --bg_color: white;
+            --el_margin: 12px;
+            --el_border-radius: 3px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        h2 {
+            margin-bottom: var(--el_margin);
+            font-weight: 500;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            margin: 60px auto;
+            padding: 12px;
+            max-width: 400px;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+
+        .items {
+            margin-bottom: calc(var(--el_margin) * 3);
+        }
+
+        .items--today h2 {
+            color: #abdcff;
+        }
+
+        .items--today span {
+            color: var(--text_color--todo);
+        }
+
+        .items--today .item:before {
+            background-image: linear-gradient(-135deg, #abdcff 0%, #0396ff 100%);
+            background-position: 0 50%;
+        }
+
+        .items--work h2 {
+            color: #fccf31;
+        }
+
+        .items--work span {
+            color: var(--text_color--todo);
+        }
+
+        .items--work .item:before {
+            background-image: linear-gradient(-135deg, #fccf31 0%, #f55555 100%);
+            background-position: 0 50%;
+        }
+
+        .items--finance h2 {
+            color: #e2b0ff;
+        }
+
+        .items--finance span {
+            color: var(--text_color--todo);
+        }
+
+        .items--finance .item:before {
+            background-image: linear-gradient(-135deg, #e2b0ff 0%, #9f44d3 100%);
+            background-position: 0 50%;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            --item-margin: var(--el_margin);
+            --item-padding: 18px;
+            position: relative;
+            margin-bottom: var(--item-margin);
+            padding: var(--item-padding);
+            width: 100%;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: var(--el_border-radius);
+            box-shadow: rgba(0, 0, 0, 0.1) 0 2px 12px;
+            transition: color 0.165s ease-out, background 0.165s ease-out;
+        }
+
+        .item:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 1;
+            transition: opacity 0.165s ease-out;
+        }
+
+        .item:active {
+            transform: translateY(1px);
+        }
+
+        .item.completed {
+            color: var(--text_color--complete);
+            background: var(--bg_color);
+            transition: color 0.33s ease-in-out 0.33s, background 0.33s ease-in-out 0.33s;
+        }
+
+        .item.completed:before {
+            opacity: 0;
+            transition: opacity 0.33s ease-in-out 0.165s;
+            animation: gradient-movement 0.66s ease-in-out;
+        }
+
+        .item.completed span {
+            color: var(--text_color--complete);
+        }
+
+        .item span.completed {
+            color: var(--text_color--complete);
+            text-decoration: line-through;
+        }
+
+        .item span:before {
+            display: inline-block;
+            transition: opacity 0.165s ease-in-out 0.165s, transform 0.165s ease-in-out 0.165s;
+        }
+
+        .item span:after {
+            content: attr(data-text);
+            text-decoration: line-through;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: opacity 0s, transform 0s;
+        }
+
+        .item.completed span:before {
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .item.completed span:after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes gradient-movement {
+            0% {
+                background-position: 0 50%;
+                background-size: 100%;
+            }
+            50% {
+                background-position: 100% 50%;
+                background-size: 400%;
+            }
+            100% {
+                background-position: 0 100%;
+                background-size: 100%;
+            }
+        }
+
+        .visually-hidden {
+            position: absolute;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            height: 1px;
+            width: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+        }
+
+        .title span {
+            margin-right: 10px;
+        }
+
+        .add-item-btn {
+            background-color: #fff;
+            border: none;
+            padding: 5px 10px;
+            font-size: 18px;
+            cursor: pointer;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        .add-item-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .delete-btn {
+            border: none;
+            padding: 5px 15px;
+            font-size: 18px;
+            cursor: pointer;
+            vertical-align: middle;
+            margin-left: 10px;
+            background: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .delete-btn:hover {
+            background-color: transparent;
+        }
+
+        .delete-btn i {
+            font-size: 18px;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <section class="items items--today">
+        <h2 class="title">Packing Checklist<button class="add-item-btn">+</button></h2>
+        <ul class="list">
+            <li class="item">
+                <span data-text="Take car into shop">Take car into shop</span>
+                <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+            </li>
+            <li class="item">
+                <span data-text="Buy speed boat">Buy speed boat</span>
+                <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+            </li>
+            <li class="item">
+                <span data-text="Phone a friend">Phone a friend</span>
+                <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+            </li>
+            <li class="item">
+                <span data-text="Bless this mess">Bless this mess</span>
+                <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+            </li>
+        </ul>
+    </section>
+    <section class="items items--work">
+        <h2 class="title">Work</h2>
+        <ul class="list">
+            <li class="item">
+                <span data-text="Finish this task">Finish this task</span>
+            </li>
+            <li class="item">
+                <span data-text="Make sure they got that thing I sent them">Make sure they got that thing I sent them</span>
+            </li>
+            <li class="item">
+                <span data-text="Call Mr. Billings">Call Mr. Billings</span>
+            </li>
+        </ul>
+    </section>
+    <section class="items items--finance">
+        <h2 class="title">Finances</h2>
+        <ul class="list">
+            <li class="item">
+                <span data-text="Buy more money">Buy more money</span>
+            </li>
+            <li class="item">
+                <span data-text="Write a bunch of checks">Write a bunch of checks</span>
+            </li>
+        </ul>
+    </section>
+    <script>
+        const completedClass = 'completed';
+        const addItemBtn = document.querySelector('.add-item-btn');
+        const list = document.querySelector('.items--today .list');
+        const deleteBtns = document.querySelectorAll('.delete-btn');
+
+        let items = document.querySelectorAll(".item");
+
+        items.forEach(item => item.addEventListener('click', toggleItemStatus));
+
+        addItemBtn.addEventListener('click', addItem);
+
+        function toggleItemStatus(e) {
+            if (e.target.tagName !== 'BUTTON') {
+                this.querySelector('span').classList.toggle(completedClass);
+            }
+        }
+
+        function addItem() {
+            const newItemText = prompt('Enter new item text:');
+            if (newItemText) {
+                const newItem = document.createElement('li');
+                newItem.className = 'item';
+                newItem.innerHTML = `
+                    <span data-text="${newItemText}">${newItemText}</span>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+                `;
+                list.appendChild(newItem);
+                newItem.addEventListener('click', toggleItemStatus);
+            }
+        }
+
+        deleteBtns.forEach(btn => btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.parentElement.remove();
+        }));
+    </script>
+</body>
+</html>

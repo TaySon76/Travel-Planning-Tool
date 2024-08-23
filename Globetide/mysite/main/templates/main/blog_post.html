@@ -1,0 +1,194 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<style>
+    .container {
+        border: 1px solid rgb(229, 227, 227);
+        position: relative;
+        top: 5vw;
+        padding: 50px 100px;
+        margin-bottom: 180px;
+    }
+
+    .blog-info {
+        position: absolute;
+        left: 145px;
+        top: 56px;
+    }
+
+    .comment-info {
+        position: absolute;
+        left: 145px;
+        font-size: 12px;
+    }
+
+    .container img {
+        width: 100%;
+    }
+
+    .profile-photo {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #545454;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+    
+    .profile-photo img {
+        max-width: 100%; /* Ensure the image does not exceed the container width */
+        max-height: 100%; /* Ensure the image does not exceed the container height */
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: none;
+    }
+
+    .profile-photo .glyphicon-user {
+        font-size: 15px;
+        color: white;
+    }
+
+    .dropdown {
+        position: absolute;
+        right: 100px;
+        top: 50px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <p class="blog-info">{{ blog.user.username }} &#8226; {{ blog.date }} &#8226; x minute read</p>
+        <div class="profile-photo">
+            <img id="profile-img" src="#" alt="Profile Photo">
+            <span class="glyphicon glyphicon-user"></span>
+        </div>
+
+        <div class="dropdown" id="dd">
+            <button class="btn dropdown-toggle" style="background-color: white;" type="button" id="about-us" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onfocusin="document.getElementById('dd').classList.add('open');" onfocusout="document.getElementById('dd').classList.remove('open');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                </svg>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="#">Share Post</a></li>
+            </ul>
+        </div>
+
+        <h1>{{ blog.title }}</h1>
+        <h3>{{ blog.subtitle }}</h3>
+        <br>
+        <img src="https://static.wixstatic.com/media/ae5901bd4fda41009c4cc4a19bb70d05.jpg/v1/fill/w_740,h_493,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/ae5901bd4fda41009c4cc4a19bb70d05.jpg">
+        <br><br><br>
+        <h4>{{ blog.body }}</h4>
+        <hr width="100%">
+        <p style="text-align: right;"><a href="/blog/{{ blog.category }}">{{ blog.category|title }}</a></p>
+        <hr>
+        <p style="position: absolute;">{{ blog.views }} views</p>
+        <p style="position: absolute; width: 100%; left: -120px; text-align: right;">{{ blog.likes }}</p>
+        <span class="glyphicon glyphicon-heart-empty" style="left: calc(100% - 10px); color: red;"></span>
+    </div>
+
+    <div class="container" style="top: 0; margin-bottom: 80px; padding-top: 25px;" id="comment-container">
+        <p>Comments</p>
+        <hr>
+
+        <form id="post-form">
+            <textarea style="width: 100%; resize: vertical;" placeholder="Write a comment..." name="comment" id="comment-input"></textarea>
+            <button type="button" name="write_comment" onclick="writeComment()" style="position: relative; display: block; margin-left: auto; padding: 5px 10px;">Submit</button>
+        </form>
+
+        <div id="all-comments">
+        {% for comment in comments %}
+        <div>
+            <p class="comment-info">{{ comment.user.username }}<br>x time ago</p>
+            <div class="profile-photo">
+                <img id="profile-img" src="#" alt="Profile Photo">
+                <span class="glyphicon glyphicon-user"></span>
+            </div>
+            <h4 style="position: relative; top: 15px; left: 45px; text-wrap: wrap; word-wrap: break-word; width: calc(100% - 45px); padding-bottom: 10px;">{{ comment.comment|linebreaks }}</h4>
+            <hr>
+        </div>
+        {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        const tx = document.getElementsByTagName("textarea");
+
+        for (let i = 0; i < tx.length; i++) {
+            tx[i].setAttribute("style", "height: auto; overflow-y:hidden; width: 100%; resize: none; padding: 10px;");
+            tx[i].addEventListener("input", OnInput, false);
+        }
+
+        function OnInput() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + "px";
+        }
+
+        window.writeComment = function() {
+            const comment = document.getElementById('comment-input').value;
+
+            document.getElementById('comment-input').value = '';
+            document.getElementById('comment-input').style.height = 'auto';
+
+            addComment(comment);
+
+            const data = {
+                comment: comment,
+            };
+
+            // Send data to the backend
+            
+            fetch('/blog/{{ blog.category }}/{{ blog.user.username }}/{{ blog.id }}/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        };
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        window.addComment = function(c) {
+                    const newComment = document.createElement('div');
+                    newComment.innerHTML = `
+                    <p class="comment-info">{{ username }}<br>a few seconds ago</p>
+                    <div class="profile-photo">
+                        <img id="profile-img" src="#" alt="Profile Photo">
+                        <span class="glyphicon glyphicon-user"></span>
+                    </div>
+                    <h4 style="position: relative; top: 15px; left: 45px; text-wrap: wrap; word-wrap: break-word; width: calc(100% - 45px); padding-bottom: 10px;">`+c.replaceAll('\n', '<br>')+`</h4>
+                    <hr>
+                    `;
+                    document.getElementById('all-comments').prepend(newComment);
+                };
+    </script>
+</body>
+{% endblock %}

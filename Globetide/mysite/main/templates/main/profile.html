@@ -1,0 +1,477 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="calendar.css">
+    <style>
+        body {
+            background-color: #CBD3F4;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .profile-photo {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #545454;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 10px;
+            margin-top: -800px;
+            margin-left: calc(-75px + 6.3vw + 50px * 3.5 + 20px + 5px * 3.5 + 5vw); /* align left, 6.3vw: calendar left val, 50px: day width val, 20px: calendar padding val, 5px: day padding val */;
+        }
+        .profile-photo img {
+            max-width: 100%; /* Ensure the image does not exceed the container width */
+            max-height: 100%; /* Ensure the image does not exceed the container height */
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: none;
+        }
+        .profile-photo .glyphicon-user {
+            font-size: 50px;
+            color: white;
+        }
+        .upload-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            left: 100px; 
+            top: 105px;
+        }
+        .profile-form {
+            background-color: #FFFFFF;
+            border: 1px solid #ccc;
+            border-radius: 40px;
+            box-shadow: 20px 20px #DFE4F8;
+            padding: 20px;
+            max-width: 50vw;
+            margin-top: 6vw;
+            margin-left: auto;
+            position: relative;
+            left: 10vw;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #202020;
+        }
+        .submit-button {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+        .submit-button button, .submit-button .cpass {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            background-color: #202020;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            width: fit-content;
+        }
+        .submit-button button:hover, .submit-button .cpass:hover {
+            background-color: black;
+        }
+        .submit-button a:link { 
+            text-decoration: none; 
+        } 
+        .submit-button a:visited { 
+            text-decoration: none; 
+        } 
+        .submit-button a:hover { 
+            text-decoration: none; 
+        } 
+        .submit-button a:active { 
+            text-decoration: none; 
+        }
+
+        .two-col {
+            overflow: hidden;
+        }
+
+        .two-col .col1,
+        .two-col .col2 {
+            width: 49%;
+        }
+
+        .two-col .col1 {
+            float: left;
+        }
+
+        .two-col .col2 {
+            float: right;
+        }
+
+        .two-col label {
+            display: block;
+        }
+  
+        .user-info {
+            position: relative;
+            left: calc(-50% + 6.3vw + 50px * 3.5 + 20px + 5px * 3.5 + 5vw); /* align left, 6.3vw: calendar left val, 50px: day width val, 20px: calendar padding val, 5px: day padding val */
+            
+            text-align: center;
+        }
+
+        .next {
+            margin-left: -78%; 
+            text-align: center;
+            font-size: 15px;
+        }
+        
+        .location-image {
+            margin: 2vw -12.5%;
+            max-width: 35vw; 
+            width: 100%;
+            height: 200px; 
+            background-color: #ccc; 
+        }
+        
+        :root {
+            --dark-body: #4d4c5a;
+            --dark-main: #141529;
+            --dark-second: #79788c;
+            --dark-hover: #323048;
+            --dark-text: #f8fbff;
+    
+            --light-body: #f3f8fe;
+            --light-main: #fdfdfd;
+            --light-second: #c3c2c8;
+            --light-hover: #edf0f5;
+            --light-text: #151426;
+    
+            --blue: #0000ff;
+            --white: #fff;
+    
+            --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    
+            --font-family: 'Segoe UI', sans-serif;
+        }
+    
+        .light {
+            --bg-body: var(--light-body);
+            --bg-main: var(--light-main);
+            --bg-second: var(--light-second);
+            --color-hover: var(--light-hover);
+            --color-txt: var(--light-text);
+            position: relative;
+        }
+    
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .light .calendar {
+            box-shadow: var(--shadow);
+        }
+        
+        #plus {
+            left: 4%;
+            right: auto;
+            top: -2%
+        }
+        #plus:hover {
+            color: white;
+        }
+        .month {
+            font-size: 24px;
+            margin-bottom: 10px;
+            margin-left: calc(-100vw + (6.3vw + 50px * 3.5 + 20px + 5px * 3.5 + 5vw) * 2);
+        }
+
+        .activity-tracker {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-left: calc(-100vw + (6.3vw + 50px * 3.5 + 20px + 5px * 3.5 + 5vw) * 2);
+        }
+
+        .day {
+            width: 40px;
+            height: 40px;
+            background-color: #FFFFFF;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .day.active {
+            background-color: #4caf50;
+            color: #fff;
+        }
+        /* Tooltip text */
+        .day .tooltiptext {
+            visibility: hidden;
+            width: fit-content;
+            background-color: grey;
+            color: #fff;
+            text-align: center;
+            padding: 2px 10px;
+            
+            /* Position the tooltip text - see examples below! */
+            position: absolute;
+            z-index: 101;
+            margin-top: 50px;
+        }
+
+        /* Show the tooltip text when you mouse over the tooltip container */
+        .day:hover .tooltiptext {
+            visibility: visible;
+        }
+        .cow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            margin-top: 50px;
+        }
+        
+    </style>
+</head>
+<body style="overflow-x: hidden;">
+    <div class="container">
+        <form method="post" class="profile-form">
+            <div class="form-group">
+                <label for="first-name">First Name</label>
+                <input type="text" id="first-name" name="first-name" class="form-control" value="{{ additional_data.firstname|default_if_none:'' }}" onkeydown="return alphaOnly(event)" required>
+            </div>
+            <div class="form-group">
+                <label for="last-name">Last Name</label>
+                <input type="text" id="last-name" name="last-name" class="form-control" value="{{ additional_data.lastname|default_if_none:'' }}" onkeydown="return alphaOnly(event)" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" value="{{ user.username }}" onkeydown="return userName(event)" required>
+            </div>
+            <div class="form-group">
+                <label for="Address">Address</label>
+                <input type="text" id="address" name="address" class="form-control" value="{{ additional_data.address|default_if_none:'' }}">
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" class="form-control" value="{{ additional_data.city_origin|default_if_none:'' }}" onkeydown="return alphaOnly(event)" required>
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" class="form-control" value="{{ additional_data.country_origin|default_if_none:'' }}" onkeydown="return alphaOnly(event)" list="countryList" required>
+                <datalist id="countryList">
+                    <!-- Options will be added here dynamically -->
+                </datalist>
+            </div>
+            <div class="form-group">
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex" class="form-control" required>
+                    <option value="male" {% if additional_data.sex == 'male' %} selected {% endif %}>Male</option>
+                    <option value="female" {% if additional_data.sex == 'female' %} selected {% endif %}>Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob" class="form-control" value="{{ additional_data.dateofbirth|date:'Y-m-d' }}" max="2024-12-31">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" class="form-control" value="{{ additional_data.phone_no|default_if_none:'' }}" onkeydown="return numsOnly(event)" required>
+            </div>
+            <div class="form-group">
+                <label for="instagram">Instagram</label>
+                <input type="text" id="instagram" name="instagram" class="form-control" placeholder="Enter @ for Instagram" value="{{ additional_data.instagram }}">
+            </div>
+            <div class="form-group">
+                <label for="twitter">Twitter</label>
+                <input type="text" id="twitter" name="twitter" class="form-control" placeholder="Enter @ for Twitter" value="{{ additional_data.twitter }}">
+            </div>
+            <div class="form-group">
+                <label for="facebook">Facebook</label>
+                <input type="text" id="facebook" name="facebook" class="form-control" placeholder="Enter url for facebook" value="{{ additional_data.facebook }}">
+            </div>
+            <div class="submit-button">
+                <button type="submit" class="btn btn-primary" onclick="validateCountry()">Save Changes</button>
+                <a href="/reset_check_email">
+                    <div class="cpass">Change Password</div>
+                </a>
+            </div>
+        </form>
+    </div>
+</body>
+<div>
+<body class="light">
+
+    <div class="profile-photo">
+        <img id="profile-img" src="#" alt="Profile Photo">
+        <span class="glyphicon glyphicon-user"></span>
+        <input type="file" id="profile-upload" style="display: none;" accept="image/*" onchange="loadFile(event)">
+        <button class="upload-btn" onclick="document.getElementById('profile-upload').click()">
+            <span class="glyphicon glyphicon-plus" id="plus"></span>
+        </button>
+    </div>
+    <div class="user-info">
+        <h3>{{ additional_data.firstname }} {{ additional_data.lastname }}</h3>
+        <p>{{ user.email }}</p>
+    </div>
+
+    <div class="cow">
+        <div class="month" id="month-year"></div>
+        <div class="activity-tracker" id="activity-grid"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const activityGrid = document.getElementById('activity-grid');
+            const monthYearElement = document.getElementById('month-year');
+            const currDate = new Date();
+            const currMonth = currDate.getMonth();
+            const currYear = currDate.getFullYear();
+            const daysInMonth = new Date(currYear, currMonth + 1, 0).getDate();
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const nums = {{ sign_ins }};
+
+            // Display current month and year
+            monthYearElement.textContent = `${monthNames[currMonth]} ${currYear}`;
+
+            // Create grid squares for each day of the month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                const toolTip = document.createElement('span');
+                toolTip.textContent = nums[i-1];
+                toolTip.classList.add('tooltiptext'); // Add a class for styling if needed
+
+                dayElement.classList.add('day');
+                dayElement.dataset.day = i;
+                dayElement.textContent = i;
+
+                dayElement.appendChild(toolTip); // Append toolTip to dayElement
+                activityGrid.appendChild(dayElement); // Append dayElement to activityGrid
+            }
+
+            // Function to mark days as active
+            const markActiveDays = (activeDays) => {
+                document.querySelectorAll('.day').forEach(day => {
+                    if (activeDays.includes(parseInt(day.dataset.day))) {
+                        day.classList.add('active');
+                    }
+                });
+            }
+
+            // Set loginData from the view
+            console.log('{{ login_data }}')
+            const loginData = JSON.parse('{{ login_data|escapejs }}');
+            console.log(loginData);
+            // Extract day from YYYY-MM-DD key and mark active days
+            const activeDays = Object.keys(loginData).map(date => parseInt(date.split('-')[2])); 
+            markActiveDays(activeDays);
+        });
+    </script>   
+   
+</body>
+</div>
+</html>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+    function alphaOnly(event) {
+      var key = event.keyCode;
+      return ((key >= 65 && key <= 90) || key == 8 || key == 39 || key == 45 || key == 37); 
+    }
+    function numsOnly(event) {
+      var key = event.keyCode;
+      return ((key >= 48 && key <= 57) || key == 8 || key == 46 || key == 37 || key == 39);    
+    }
+    function userName(event){
+        var key = event.keyCode;
+        return ((key >= 48 && key <= 57) || (key >= 65 && key <= 90) || key == 8 || key == 46 || key == 37 || key == 39);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch("{% static 'main/countries.txt' %}")
+            .then(response => response.text())
+            .then(data => {
+                const countries = data.split('\n').map(country => country.trim()).filter(country => country);
+                const datalist = document.getElementById('countryList');
+                countries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country;
+                    datalist.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching countries.txt:', error));
+    });
+
+    function validateCountry() {
+        const countryInput = document.getElementById('country');
+        const countryList = document.getElementById('countryList');
+        const options = countryList.options;
+        let valid = false;
+
+        for (let i = 0; i < options.length; i++) {
+            if (countryInput.value === options[i].value) {
+                valid = true;
+                break;
+            }
+        }
+
+        if (!valid) {
+            alert('Please enter a valid country.');
+            countryInput.focus();
+        }
+    }
+
+    var loadFile = function(event) {
+        var image = document.getElementById('profile-img');
+        image.src = URL.createObjectURL(event.target.files[0]);
+        image.style.display = 'block';
+        document.querySelector('.glyphicon-user').style.display = 'none'; 
+    };
+
+    var input    = document.querySelector("#country"), // Selects the input.
+        datalist = document.querySelector("datalist"); // Selects the datalist.
+    
+    input.addEventListener("keyup", (e) => {
+
+        // If input value is longer or equal than 2 chars, adding "users" on ID attribute.
+        if (e.target.value.length >= 3) {
+            datalist.setAttribute("id", "countryList");
+        } else {
+            datalist.setAttribute("id", "ntn");
+        }
+    });
+</script>
+</html>
+
+{% endblock %}

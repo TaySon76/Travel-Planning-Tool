@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load extras %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Tracker</title>
+    <style>
+        .cow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        
+        }
+        .month {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .activity-tracker {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day {
+            width: 40px;
+            height: 40px;
+            background-color: #ebedf0;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .day.active {
+            background-color: #4caf50;
+            color: #fff;
+        }
+        /* Tooltip text */
+        .day .tooltiptext {
+            visibility: hidden;
+            width: fit-content;
+            background-color: grey;
+            color: #fff;
+            text-align: center;
+            padding: 2px 10px;
+            
+            /* Position the tooltip text - see examples below! */
+            position: absolute;
+            z-index: 101;
+            margin-top: 50px;
+        }
+
+        /* Show the tooltip text when you mouse over the tooltip container */
+        .day:hover .tooltiptext {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="cow">
+    <div class="month" id="month-year"></div>
+    <div class="activity-tracker" id="activity-grid"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const activityGrid = document.getElementById('activity-grid');
+            const monthYearElement = document.getElementById('month-year');
+            const currDate = new Date();
+            const currMonth = currDate.getMonth();
+            const currYear = currDate.getFullYear();
+            const daysInMonth = new Date(currYear, currMonth + 1, 0).getDate();
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const nums = {{ sign_ins }};
+
+            // Display current month and year
+            monthYearElement.textContent = `${monthNames[currMonth]} ${currYear}`;
+
+            // Create grid squares for each day of the month
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                const toolTip = document.createElement('span');
+                toolTip.textContent = nums[i-1];
+                toolTip.classList.add('tooltiptext'); // Add a class for styling if needed
+
+                dayElement.classList.add('day');
+                dayElement.dataset.day = i;
+                dayElement.textContent = i;
+
+                dayElement.appendChild(toolTip); // Append toolTip to dayElement
+                activityGrid.appendChild(dayElement); // Append dayElement to activityGrid
+            }
+
+            // Function to mark days as active
+            const markActiveDays = (activeDays) => {
+                document.querySelectorAll('.day').forEach(day => {
+                    if (activeDays.includes(parseInt(day.dataset.day))) {
+                        day.classList.add('active');
+                    }
+                });
+            }
+
+            // Set loginData from the view
+            console.log('{{ login_data }}')
+            const loginData = JSON.parse('{{ login_data|escapejs }}');
+            console.log(loginData);
+            // Extract day from YYYY-MM-DD key and mark active days
+            const activeDays = Object.keys(loginData).map(date => parseInt(date.split('-')[2])); 
+            markActiveDays(activeDays);
+        });
+    </script>
+</body>
+</html>

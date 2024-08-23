@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Destination</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Select Destination</h1>
+        <form id="searchForm" method="GET" action="/path-to-your-view/">
+            <div class="form-group">
+                <label for="keyword">Enter a keyword to search for places:</label>
+                <input type="text" class="form-control" id="keyword" name="param" placeholder="Enter keyword" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <div class="mt-5" id="results">
+            <!-- Results will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const keyword = document.getElementById('keyword').value;
+            fetch(`/path-to-your-view/?param=${keyword}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = ''; // Clear previous results
+                    if (data.data && data.data.length > 0) {
+                        const list = document.createElement('ul');
+                        list.className = 'list-group';
+                        data.data.forEach(location => {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'list-group-item';
+                            listItem.textContent = `${location.name} - ${location.subType}`;
+                            list.appendChild(listItem);
+                        });
+                        resultsDiv.appendChild(list);
+                    } else {
+                        resultsDiv.textContent = 'No results found';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+</html>

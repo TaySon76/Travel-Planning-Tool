@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins&display=swap">
+    <link rel="stylesheet" href="https://kit-free.fontawesome.com/releases/latest/css/free.min.css" media="all">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container {
+            background: #171717;
+            color: #fff;
+            padding: 2rem;
+            width: 40%;
+            margin: 4rem auto;
+            border-radius: 10px;
+        }
+
+        .weather__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        input {
+            border: none;
+            background: #1e1e1e;
+            outline: none;
+            color: #fff;
+            padding: 0.5rem 2.5rem;
+            border-radius: 5px;
+        }
+
+        input::placeholder {
+            color: #fff;
+        }
+
+        .weather__search {
+            position: relative;
+        }
+
+        .weather__search i {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            font-size: 15px;
+            color: #fff;
+        }
+
+        .weather__units {
+            font-size: 1.5rem;
+        }
+
+        .weather__units span {
+            cursor: pointer;
+        }
+
+        .weather__units span:first-child {
+            margin-right: 0.5rem;
+        }
+
+        .weather__body {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .weather__datetime {
+            margin-bottom: 2rem;
+            font-size: 14px;
+        }
+
+        .weather__forecast {
+            background: #1e1e1e;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+        }
+
+        .weather__icon img {
+            width: 100px;
+        }
+
+        .weather__temperature {
+            font-size: 1.75rem;
+        }
+
+        .weather__minmax {
+            display: flex;
+            justify-content: center;
+        }
+
+        .weather__minmax p {
+            font-size: 14px;
+            margin: 0.5rem;
+        }
+
+        .weather__info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .weather__card {
+            display: flex;
+            align-items: center;
+            background: #1e1e1e;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .weather__card i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .weather__card p {
+            font-size: 14px;
+        }
+
+        @media(max-width: 936px){
+            .container {
+                width: 90%;
+            }
+
+            .weather__header {
+                flex-direction: column;
+            }
+
+            .weather__units {
+                margin-top: 1rem;
+            }
+        }
+
+
+        @media(max-width: 400px){
+            .weather__info {
+                grid-template-columns: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="weather__header">
+            <form class="weather__search">
+                <input type="text" placeholder="Search for a city..." class="weather__searchform">
+                <i class="fas fa-search"></i>
+            </form> 
+            <div class="weather__units">
+                <span class="weather_unit_celsius" id="C" onclick="convertTemp(this.id)">&#176C</span>
+                <span class="weather_unit_fahrenheit" id="F" onclick="convertTemp(this.id)">&#176F</span>
+            </div>
+        </div>
+        <div class="weather__body">
+            {% for time, data in weather_dict.items %}
+            <h1 class="weather__city">{{ data.location_name }}</h1>
+            <div class="weather__datetime">{{ data.time }}</div>
+            <div class="weather__forecast">
+                {% if data.summary == 'partlycloudy_day' or data.summary == 'lightrainshowers_day' or data.summary == 'rainshowers_day' or data.summary == 'heavyrainshowers_day' or data.summary == 'lightrain' or data.summary == 'cloudy' or data.summary == 'partlycloudy_night' or data.summary == 'fair_day' %}
+                    {% if data.summary == 'lightrainshowers_day' or data.summary == 'rainshowers_day' or data.summary == 'heavyrainshowers_day' or data.summary == 'lightrain' or data.summary == 'heavyrain' %}
+                        {% with "rain" as weather_forecast %}
+                            {{ weather_forecast }}
+                        {% endwith %}
+                    {% elif data.summary == 'partlycloudy_day' or data.summary == 'cloudy' or data.summary == 'partlycloudy_night' %}
+                        {% with "cloudy" as weather_forecast %}
+                            {{ weather_forecast }}
+                        {% endwith %}
+                    {% else %}
+                        {% with "clear" as weather_forecast %}
+                            {{ weather_forecast }}
+                        {% endwith %}
+                    {% endif %}
+                {% else %}
+                    {% with "unknown" as weather_forecast %}
+                        {{ weather_forecast }}
+                    {% endwith %}
+                {% endif %}
+            </div>
+            <p id="weather_icon"></p>
+            <p class="weather__temperature" id="C">{{ data.temperature }}&#176C</p>
+            <div class="weather__minmax">
+                <p>Min: {{ data.min_temp }}&#176</p>
+                <p>Max: {{ data.max_temp }}&#176</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="weather__info">
+            {% for time, data in weather_dict.items %}
+            <div class="weather__card">
+                <i class="fa-solid fa-temperature-full"></i>
+                <div>
+                    <p>Humidity</p>
+                    <p class="weather__realfeel">{{ data.humidity }} %</p>
+                </div>
+            </div>
+            <div class="weather__card">
+                <i class="fa-solid fa-droplet"></i>
+                <div>
+                    <p>Precipitation</p>
+                    <p class="weather__humidity">{{ data.precip_next_hour }} mm</p>
+                </div>
+            </div>
+            <div class="weather__card">
+                <i class="fa-solid fa-wind"></i>
+                <div>
+                    <p>Wind</p>
+                    <p class="weather__wind">{{ data.wind_speed }} m/s</p>
+                </div>
+            </div>
+            <div class="weather__card">
+                <i class="fa-solid fa-gauge-high"></i>
+                <div>
+                    <p>Pressure</p>
+                    <p class="weather__pressure">{{ data.air_pressure }} hPa</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <script src="https://kit.fontawesome.com/a692e1c39f.js" crossorigin="anonymous"></script>
+    <script>
+        let units = "metric";
+
+        let city = document.querySelector(".weather__city");
+        let datetime = document.querySelector(".weather__datetime");
+        let weather__forecast = document.querySelector('.weather__forecast');
+        let weather__temperature = document.querySelector(".weather__temperature");
+        let weather__icon = document.querySelector("#weather_icon");
+        let weather__minmax = document.querySelector(".weather__minmax")
+        let weather__realfeel = document.querySelector('.weather__realfeel');
+        let weather__humidity = document.querySelector('.weather__humidity');
+        let weather__wind = document.querySelector('.weather__wind');
+        let weather__pressure = document.querySelector('.weather__pressure');
+
+        document.querySelector(".weather__search").addEventListener('submit', e => {
+            let search = document.querySelector(".weather__searchform");
+            e.preventDefault();
+            currCity = search.value;
+            getWeather();
+            search.value = ""
+        })
+
+        document.querySelector(".weather_unit_celsius").addEventListener('click', () => {
+            document.querySelectorAll(".temperature").forEach(element => {
+                let currentTemp = element.getAttribute("data-temp");
+                let convertedTemp = Math.round((currentTemp - 32) * (5/9));
+                element.textContent = convertedTemp;
+                element.setAttribute("data-temp", convertedTemp);
+            });
+        });
+
+        document.querySelector(".weather_unit_fahrenheit").addEventListener('click', () => {
+            document.querySelectorAll(".temperature").forEach(element => {
+                let currentTemp = element.getAttribute("data-temp");
+                let convertedTemp = Math.round((currentTemp * (9/5)) + 32);
+                element.textContent = convertedTemp;
+                element.setAttribute("data-temp", convertedTemp);
+            });
+        });
+
+        function convertCountryCode(country){
+            let regionNames = new Intl.DisplayNames(["en"], {type: "region"});
+            return regionNames.of(country)
+        }
+    </script>
+    <script>
+        let weather_icons = {
+            "rain": "fa-solid fa-cloud-rain",
+            "cloudy": "fa-solid fa-cloud",
+            "clear": "fa-solid fa-sun",
+        };
+    
+        function setWeatherIcon(forecast) {
+            let emoji = weather_icons[forecast] || "❓";
+            console.log(emoji);
+            if (emoji != '❓') {
+                weather__icon.className = emoji;
+            }
+            else {
+                weather__icon.className = '';
+                weather__icon.textContent = "❓";
+            };
+        };
+
+        function convertTemp(id) {
+                check = document.getElementsByClassName('weather__temperature')[0].id;
+
+                if (id == 'C' && check == 'F') {
+                        let conv = parseInt(document.getElementsByClassName('weather__temperature')[0].innerText);
+                        let out = Math.round((conv - 32) * (5/9));
+                        document.getElementsByClassName('weather__temperature')[0].innerText = `${out}°C`
+                        document.getElementsByClassName('weather__temperature')[0].id = 'C'
+                } else if (id == 'F' && check == 'C') {
+                        let conv = parseInt(document.getElementsByClassName('weather__temperature')[0].innerText);
+                        let out = Math.round((conv * 9/5) + 32);
+                        document.getElementsByClassName('weather__temperature')[0].innerText = `${out}°F`
+                        document.getElementsByClassName('weather__temperature')[0].id = 'F'
+                };
+        };
+
+            
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                let weatherData1 = {{ weather_dict|safe }};
+                let weatherData = '{{ weather_dict }}';
+                console.log('Weather Data:', weatherData1);
+    
+                let summary = "";
+                for (let date in weatherData1) {
+                    console.log(weatherData1[date])
+                    if (weatherData1[date].summary) {
+                        summary = weatherData1[date].summary;
+                        break;
+                    }
+                }
+    
+                console.log('Summary:', summary);
+    
+                let summaryMapping = {
+                    "partlycloudy_day": "cloudy",
+                    "lightrainshowers_day": "rain",
+                    "rainshowers_day": "rain",
+                    "heavyrainshowers_day": "rain",
+                    "lightrain": "rain",
+                    "cloudy": "cloudy",
+                    "partlycloudy_night": "cloudy",
+                    "fair_day": "clear",
+                    "heavyrain": "rain",
+                };
+    
+                let mappedSummary = summaryMapping[summary] || summary;
+                console.log('Mapped Summary:', mappedSummary);
+    
+                setWeatherIcon(mappedSummary);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+        </script>
+            
+    </body>
+    </html>
+    
